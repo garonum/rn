@@ -62,17 +62,18 @@ class _MyHomePageState extends State<MyHomePage> {
     this.handler.updateSlice(slice);
 
   }
-  List<Container> te(int index, Slice slice){
-   // print("test");
+  List<Container> test1(int index){
+
     //selected выбранный ранее срез, если ранее он выбран небыл находится в значении 0
-  //  snapshot.data![index].firstParametr
+    Future<List<Slice>> slice = this.handler.retrieveSlices();
+    print(slice);
     List<Container> x = [];
     for (int i = 0; i < 3; i++){
       x.insert(x.length, Container(
         height: 77,
         color: Colors.amber[600],
         child:  ListTile(
-          selected: getState(i,slice),//selected сохраненное значение
+          selected: false,//getState(i,slice),//selected сохраненное значение
           selectedTileColor: Colors.yellow,
           title: Container(
               padding: EdgeInsets.all(10),
@@ -93,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           onTap: () {
             setState(() {
-              print('tokaboka');
+
               //setStateOfSlice(index, i, slice);
               // selectedIndex = 0;
             });
@@ -134,18 +135,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   late DatabaseHandler handler;
-  late List<Container> result;
+   List<Container> result = [];
   int selectedIndex = -1;
   @override
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
-    this.result = te();
     this.handler.initializeDB().whenComplete(() async {
       //await this.addSlices();
+
       setState(() {});
     });
 
+    this.result = test1();
   }
 
   @override
@@ -153,15 +155,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title[_selectedIndex]),//Text(widget.title!),
+        title: Text(title[_selectedIndex]),
       ),
       body: FutureBuilder(
         future: this.handler.retrieveSlices(),
         builder: (BuildContext context, AsyncSnapshot<List<Slice>> snapshot) {
           if (snapshot.hasData) {
-            print('===================');
+
             return ListView.builder(
-              itemCount: snapshot.data?.length,//data.length,//
+              itemCount: snapshot.data?.length,
               itemBuilder: (BuildContext context, int index) {
                 return Dismissible(
                   direction: DismissDirection.endToStart,
@@ -171,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Icon(Icons.delete_forever),
                   ),
-                  key: UniqueKey(),//ValueKey<int>(index),//(snapshot.data![index].id!),
+                  key: UniqueKey(),
                   onDismissed: (DismissDirection direction) async {
                     await this.handler.deleteSlice(snapshot.data![index].id!);
                     setState(() {
@@ -188,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     alignment: Alignment.center,
                     child: ListView(
                       padding: const EdgeInsets.all(8),
-                      children: te(index, snapshot.data![index]),
+                      children: test1(index),
                     ),
                   ),
                 );
@@ -312,11 +314,8 @@ class DatabaseHandler {
   Future<List<Slice>> retrieveSlices() async {
     final Database db = await initializeDB();
     final List<Map<String, Object?>> queryResult = await db.query('slices');
-
     return queryResult.map((e) => Slice.fromMap(e)).toList();
-    print(")(");
-    print(queryResult);
-    print(")(");
+
   }
 
   Future<void> deleteSlice(int id) async {
@@ -353,7 +352,7 @@ class DatabaseHandler {
       whereArgs: [slice.id],
     );
     final List<Map<String, Object?>> queryResult = await db.query('slices');
-    print(queryResult);
+    //print(queryResult);
     queryResult.map((e) => Slice.fromMap(e)).toList();
 
   }
