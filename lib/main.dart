@@ -1,3 +1,5 @@
+import 'dart:js_util/js_util_wasm.dart';
+
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -57,23 +59,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return false;
   }
 
-  setStateOfSlice(int index, int row, Slice slice){
+  setStateOfSlice( int row, Slice slice){
     slice.selected = row+1;
     this.handler.updateSlice(slice);
 
   }
-  List<Container> test1(int index){
-
+  List<Container> test1(Slice snapshot){
+    //print(snapshot);
     //selected выбранный ранее срез, если ранее он выбран небыл находится в значении 0
-    Future<List<Slice>> slice = this.handler.retrieveSlices();
-    print(slice);
+    // Future<List<Slice>> slice = this.handler.retrieveSlices();
+    // print(slice);
+
     List<Container> x = [];
     for (int i = 0; i < 3; i++){
+      var s = false;
+      if ((i+1)==2){
+        s = true;
+      } else{ }
+      //print(s);
       x.insert(x.length, Container(
         height: 77,
         color: Colors.amber[600],
         child:  ListTile(
-          selected: false,//getState(i,slice),//selected сохраненное значение
+          selected: s,//getState(i,slice),//selected сохраненное значение
           selectedTileColor: Colors.yellow,
           title: Container(
               padding: EdgeInsets.all(10),
@@ -95,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: () {
             setState(() {
 
-              //setStateOfSlice(index, i, slice);
+              setStateOfSlice( i, snapshot);
               // selectedIndex = 0;
             });
           },
@@ -135,24 +143,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   late DatabaseHandler handler;
-   List<Container> result = [];
+   //List<Container> result = [];
   int selectedIndex = -1;
   @override
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
     this.handler.initializeDB().whenComplete(() async {
-      //await this.addSlices();
 
       setState(() {});
     });
 
-    this.result = test1();
+    //this.result = test1(0);
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(title[_selectedIndex]),
@@ -161,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
         future: this.handler.retrieveSlices(),
         builder: (BuildContext context, AsyncSnapshot<List<Slice>> snapshot) {
           if (snapshot.hasData) {
-
+            //print(snapshot.data?.length);
             return ListView.builder(
               itemCount: snapshot.data?.length,
               itemBuilder: (BuildContext context, int index) {
@@ -190,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     alignment: Alignment.center,
                     child: ListView(
                       padding: const EdgeInsets.all(8),
-                      children: test1(index),
+                      children: test1(snapshot.data![index]),
                     ),
                   ),
                 );
@@ -352,7 +358,7 @@ class DatabaseHandler {
       whereArgs: [slice.id],
     );
     final List<Map<String, Object?>> queryResult = await db.query('slices');
-    //print(queryResult);
+   // print(queryResult);
     queryResult.map((e) => Slice.fromMap(e)).toList();
 
   }
