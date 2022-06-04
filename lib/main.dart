@@ -17,7 +17,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.blue,
+        ).copyWith(
+          secondary: Colors.green,
+        ),
+        textTheme: const TextTheme(bodyText2: TextStyle(color: Colors.purple)),
+        //primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Луч Земли'),
     );
@@ -45,35 +51,31 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  bool getState(int row, Slice slice){
-
-    if (slice.selected-1 == row){
-      return true;
-    }
-    if (slice.selected-1 == 0 || slice.selected-1 != row ){
-      return false;
-    }
-
-    return false;
-  }
 
   setStateOfSlice(int index, int row, Slice slice){
     slice.selected = row+1;
     this.handler.updateSlice(slice);
 
   }
-  List<Container> te(int index, Slice slice){
-   // print("test");
-    //selected выбранный ранее срез, если ранее он выбран небыл находится в значении 0
-  //  snapshot.data![index].firstParametr
+  List<Container> te(int index, int selected, Slice slice){
+
     List<Container> x = [];
+
     for (int i = 0; i < 3; i++){
+      print("-----------------------------");
+
+      var s = false;
+      if (i+1 == selected){
+        s = true;
+      }
+      print(s);
       x.insert(x.length, Container(
         height: 77,
-        color: Colors.amber[600],
+        color: s ? Colors.yellow : Colors.orange,
         child:  ListTile(
-          selected: getState(i,slice),//selected сохраненное значение
-          selectedTileColor: Colors.yellow,
+          selected: s,
+          tileColor: Colors.white,
+          //selectedTileColor: Colors.black,
           title: Container(
               padding: EdgeInsets.all(10),
               color: Colors.transparent,
@@ -93,8 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           onTap: () {
             setState(() {
-              print('tokaboka');
-              //setStateOfSlice(index, i, slice);
+
+              setStateOfSlice(index, i, slice);
+              
               // selectedIndex = 0;
             });
           },
@@ -117,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onChanged: (String? newValue) {
             setState(() {
 
-             // selectedIntervals[index] = newValue!;
+              // selectedIntervals[index] = newValue!;
             });
           },
           items: <String>['One', 'Two', 'Three', 'Four']
@@ -134,18 +137,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   late DatabaseHandler handler;
-  late List<Container> result;
+  late List<List<Container>> result = [];
   int selectedIndex = -1;
+
   @override
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
-    this.result = te();
+
     this.handler.initializeDB().whenComplete(() async {
       //await this.addSlices();
+      var t =  await this.handler.retrieveSlices();
+      for (int i = 0; i < t.length; i++){
+        // print("--------");
+        //
+        // print(t[i].selected);
+        this.result.add(te(i+1,t[i].selected,t[i]));
+      }
       setState(() {});
     });
-
   }
 
   @override
@@ -188,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     alignment: Alignment.center,
                     child: ListView(
                       padding: const EdgeInsets.all(8),
-                      children: te(index, snapshot.data![index]),
+                      children: this.result[index],
                     ),
                   ),
                 );
@@ -253,6 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 }
 
+
 class Slice {
   final int? id;
   final String firstParametr;
@@ -276,7 +287,7 @@ class Slice {
         secondParametr = res["secondParametr"],
         product = res["product"],
         email = res["email"],
-        selected = 0;
+        selected = res["selected"];
 
   Map<String, Object?> toMap() {
     return {'id':id,'firstParametr': firstParametr, 'secondParametr': secondParametr, 'product': product, 'email': email, 'selected': selected};
@@ -290,7 +301,7 @@ class DatabaseHandler {
     String path = await getDatabasesPath();
 
     return openDatabase(
-      join(path, 'rn.db'),
+      join(path, 'rn1.db'),
       onCreate: (database, version) async {
         await database.execute(
           "CREATE TABLE slices(id INTEGER PRIMARY KEY AUTOINCREMENT, firstParametr TEXT NOT NULL,secondParametr STRING NOT NULL, product TEXT NOT NULL, email TEXT, selected int)",
