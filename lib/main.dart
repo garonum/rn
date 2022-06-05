@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
             setState(() {
 
               setStateOfSlice(index, i, slice);
-              
+
               // selectedIndex = 0;
             });
           },
