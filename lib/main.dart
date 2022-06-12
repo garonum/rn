@@ -1,10 +1,6 @@
-import 'dart:js_util/js_util_wasm.dart';
-
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
-
 
 void main() {
   runApp(MyApp());
@@ -37,7 +33,7 @@ class MyHomePage extends StatefulWidget {
   final String? title;
 
   @override
-   _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -54,32 +50,39 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-  setStateOfSlice( int row, Slice slice){
-    slice.selected = row+1;
+  setStateOfSlice(int index, int row, Slice slice){
+    slice.selectedSlice = row+1;
     this.handler.updateSlice(slice);
 
   }
-
-  List<Container> te(int index, int selected, Slice slice){
-
+  updateresult() async {
+    this.result.clear();
+    var r =  await this.handler.retrieveSlices();
+    for (int i = 0; i < r.length; i++){
+      this.result.add(te(i+1,r[i].selectedSlice,r[i]));
+    }
+  }
+  saveIntervals(int index, int num, Slice slice){
+    slice.selectedInterval = num;
+    this.handler.updateSlice(slice);
+  }
+  List<Container> te(int index, int selectedSlice, Slice slice){
 
     List<Container> x = [];
 
     for (int i = 0; i < 3; i++){
-
       print("-----------------------------");
 
       var s = false;
-      if (i+1 == selected){
+      if (i+1 == selectedSlice){
         s = true;
       }
-      print(s);
+
 
       x.insert(x.length, Container(
         height: 77,
         color: s ? Colors.yellow : Colors.orange,
         child:  ListTile(
-
           selected: s,
           tileColor: Colors.white,
           //selectedTileColor: Colors.black,
@@ -100,23 +103,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               )
           ),
-          onTap: () {
+          onTap: () async {
+            await setStateOfSlice(index, i, slice);
+            await updateresult();
             setState(() {
-
-
-              setStateOfSlice(index, slice);
 
               // selectedIndex = 0;
             });
+
           },
         ),
       ));
 
     }
+    var str = <String>['One', 'Two', 'Three', 'Four'];
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
-          value: "One",//selectedIntervals[index],
+          value: str[slice.selectedInterval],
           icon: const Icon(Icons.arrow_downward),
           iconSize: 24,
           elevation: 16,
@@ -127,11 +131,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           onChanged: (String? newValue) {
             setState(() {
-
+              saveIntervals(index, slice.selectedInterval, slice);
               // selectedIntervals[index] = newValue!;
             });
           },
-          items: <String>['One', 'Two', 'Three', 'Four']
+          items:
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -145,16 +149,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   late DatabaseHandler handler;
-
   late List<List<Container>> result = [];
-
   int selectedIndex = -1;
 
   @override
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
-
 
     this.handler.initializeDB().whenComplete(() async {
       //await this.addSlices();
@@ -163,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // print("--------");
         //
         // print(t[i].selected);
-        this.result.add(te(i+1,t[i].selected,t[i]));
+        this.result.add(te(i+1,t[i].selectedSlice,t[i]));
       }
       setState(() {});
     });
@@ -171,17 +172,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(title[_selectedIndex]),
+        title: Text(title[_selectedIndex]),//Text(widget.title!),
       ),
       body: FutureBuilder(
         future: this.handler.retrieveSlices(),
         builder: (BuildContext context, AsyncSnapshot<List<Slice>> snapshot) {
           if (snapshot.hasData) {
-            //print(snapshot.data?.length);
+            print('===================');
             return ListView.builder(
-              itemCount: snapshot.data?.length,
+              itemCount: snapshot.data?.length,//data.length,//
               itemBuilder: (BuildContext context, int index) {
                 return Dismissible(
                   direction: DismissDirection.endToStart,
@@ -191,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Icon(Icons.delete_forever),
                   ),
-                  key: UniqueKey(),
+                  key: UniqueKey(),//ValueKey<int>(index),//(snapshot.data![index].id!),
                   onDismissed: (DismissDirection direction) async {
                     await this.handler.deleteSlice(snapshot.data![index].id!);
                     setState(() {
@@ -208,9 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     alignment: Alignment.center,
                     child: ListView(
                       padding: const EdgeInsets.all(8),
-
                       children: this.result[index],
-
                     ),
                   ),
                 );
@@ -265,8 +265,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<int> addSlices() async {
     //this.handler.deleteSlice(0);
-     //data.add([false,false,false]);
-    Slice firstSlice = Slice(firstParametr: "Первый срез", secondParametr: "jn", product: "Название продукта",selected: 0);
+    //data.add([false,false,false]);
+    Slice firstSlice = Slice(firstParametr: "Первый срез", secondParametr: "jn", product: "Название продукта",selectedSlice: 0,selectedInterval: 0);
     List<Slice> listOfSlices = [firstSlice];
     //selectedIntervals.add("One");
     return await this.handler.insertSlice(listOfSlices);
@@ -282,7 +282,8 @@ class Slice {
   final String secondParametr;
   final String product;
   final String? email;
-  int selected;
+  int selectedSlice;
+  int selectedInterval;
 
   Slice(
       { this.id,
@@ -290,7 +291,8 @@ class Slice {
         required this.secondParametr,
         required this.product,
         this.email,
-        required this.selected
+        required this.selectedSlice,
+        required this.selectedInterval
       });
 
   Slice.fromMap(Map<String, dynamic> res)
@@ -299,10 +301,12 @@ class Slice {
         secondParametr = res["secondParametr"],
         product = res["product"],
         email = res["email"],
-        selected = res["selected"];
+        selectedSlice = res["selectedSlice"],
+        selectedInterval = res["selectedInterval"];
+
 
   Map<String, Object?> toMap() {
-    return {'id':id,'firstParametr': firstParametr, 'secondParametr': secondParametr, 'product': product, 'email': email, 'selected': selected};
+    return {'id':id,'firstParametr': firstParametr, 'secondParametr': secondParametr, 'product': product, 'email': email, 'selectedSlice': selectedSlice, 'selectedInterval': selectedInterval};
   }
 }
 
@@ -313,10 +317,10 @@ class DatabaseHandler {
     String path = await getDatabasesPath();
 
     return openDatabase(
-      join(path, 'rn1.db'),
+      join(path, 'rn2.db'),
       onCreate: (database, version) async {
         await database.execute(
-          "CREATE TABLE slices(id INTEGER PRIMARY KEY AUTOINCREMENT, firstParametr TEXT NOT NULL,secondParametr STRING NOT NULL, product TEXT NOT NULL, email TEXT, selected int)",
+          "CREATE TABLE slices(id INTEGER PRIMARY KEY AUTOINCREMENT, firstParametr TEXT NOT NULL,secondParametr STRING NOT NULL, product TEXT NOT NULL, email TEXT, selectedSlice int, selectedInterval int)",
         );
       },
       version: 1,
@@ -335,8 +339,11 @@ class DatabaseHandler {
   Future<List<Slice>> retrieveSlices() async {
     final Database db = await initializeDB();
     final List<Map<String, Object?>> queryResult = await db.query('slices');
-    return queryResult.map((e) => Slice.fromMap(e)).toList();
 
+    return queryResult.map((e) => Slice.fromMap(e)).toList();
+    print(")(");
+    print(queryResult);
+    print(")(");
   }
 
   Future<void> deleteSlice(int id) async {
@@ -350,16 +357,16 @@ class DatabaseHandler {
     );
 
     final List<Map<String, Object?>> queryResult = await db.query('slices');
-  //   print(")(");
-  // print(queryResult);
-  //   print(")(");
+    //   print(")(");
+    // print(queryResult);
+    //   print(")(");
   }
 
   updateSlice(Slice slice){
 
-     updateSliceInDB(slice);
+    updateSliceInDB(slice);
   }
-   updateSliceInDB(Slice slice) async {
+  updateSliceInDB(Slice slice) async {
     // Get a reference to the database.
     final db = await initializeDB();
 
@@ -373,7 +380,8 @@ class DatabaseHandler {
       whereArgs: [slice.id],
     );
     final List<Map<String, Object?>> queryResult = await db.query('slices');
-   // print(queryResult);
+    print("++++++++");
+    print(queryResult);
     queryResult.map((e) => Slice.fromMap(e)).toList();
 
   }
