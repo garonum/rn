@@ -256,6 +256,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   Container resultPage(){
+    //var finalResult =  this.handler.calculateResult();
+    //String e = finalResult[0].toString();
+    //print(e);
     double width = 98;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20.0),
@@ -275,14 +278,15 @@ class _MyHomePageState extends State<MyHomePage> {
         // logout
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
+              children: <Widget>[
                 Icon(
                   Icons.public,
                   color: Colors.black,
                   size: 24.0,
                   semanticLabel: 'Text to announce in accessibility modes',
                 ),
-                Text("100"),
+
+                Text("9"),
               ],
             ),
           ),
@@ -473,7 +477,7 @@ class Slice {
 
 
 class DatabaseHandler {
-  var rayname = ['RayOfEarth','RayOfHuman','RayOfReturn','RayOfExit',"Results"];
+  static const rayname = ['RayOfEarth','RayOfHuman','RayOfReturn','RayOfExit',"Results"];
   Future<Database> initializeDB() async {
     String path = await getDatabasesPath();
 
@@ -556,6 +560,118 @@ class DatabaseHandler {
     print(queryResult);
     queryResult.map((e) => Slice.fromMap(e)).toList();
 
+  }
+
+   int getRayCoefficient(String rayName, int slice){
+
+    final coefficientRayOfEarth = [7,14,20,27];
+
+    final coefficientRayOfHuman = [5, 9, 14, 18, 23, 27];
+
+    final coefficientRayOfReturn = [4, 8, 12, 16, 20, 24, 27];
+
+    final coefficientRayOfExit = [27, 24, 21, 18, 15, 12, 9, 6, 3];
+
+    switch(rayName){
+
+      case 'RayOfEarth':
+
+        return coefficientRayOfEarth[slice].toInt();
+        break;
+      case 'RayOfHuman':
+        return coefficientRayOfHuman[slice].toInt();
+
+        break;
+      case 'RayOfReturn':
+        return coefficientRayOfReturn[slice].toInt();
+        break;
+      case 'RayOfExit':
+        return coefficientRayOfExit[slice].toInt();
+        break;
+      default:
+        return 0;
+    }
+  }
+
+  getIntervalCoefficient(String intetval){
+
+    switch(intetval){
+      case "От 1 с - до 5 мин":
+        return 13;
+        break;
+      case "От 5 мин - до 20 мин":
+        return 12;
+
+        break;
+      case "От 20 мин - до 1 ч":
+        return 11;
+        break;
+    case "От 1 ч - до 2 ч":
+    return 10;
+    break;
+    case "От 2 ч - до 6 ч":
+    return 9;
+    break;
+    case "От 6 ч - до 24 ч":
+    return 8;
+    break;
+    case "От 1 дня - до 2 дней":
+    return 7;
+    break;
+    case "От 2 дней - до 5 дней":
+    return 6;
+    break;
+    case "От 5 дней - до 7 дней":
+    return 5;
+    break;
+    case "От 1 недели - до 1 месяца":
+      return 4;
+      break;
+    case "От 1 месяца - до 6 мес.":
+    return 3;
+    break;
+    case "От 6 мес - до 12 мес":
+    return 2;
+    break;
+      case "более года":
+        return 1;
+        break;
+      default:
+        return 0;
+    }
+  }
+
+
+   calculateResult() async{
+    final db = await initializeDB();
+    List finalResult = [0,0,0,0];
+
+    for (int i = 0; i < rayname.length-1; i++){
+      final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
+      //finalResult.add(queryResult);
+      //print(coefficientRayOfEarth[0]);
+      //print(queryResult);
+      var x = queryResult.map((e) => Slice.fromMap(e)).toList();
+
+      var d = x;
+      if(d.length > 0 ){
+        for (int e = 0; e < d.length; e++){
+          //var x = getRayCoefficient(rayname[i]);
+          //getRayCoefficient(rayname[i], d[e].selectedSlice.toInt());
+          finalResult[i] =  finalResult[i] +(getRayCoefficient(rayname[i], d[e].selectedSlice.toInt()-1) * getIntervalCoefficient(d[e].selectedInterval)).toInt();//выбранный интеррвал перемножает
+          // print("!!");
+          // print(finalResult);
+          // print("!!");
+        }
+
+      }else{
+
+      }
+
+
+    }
+    //print(finalResult);
+  return finalResult;
   }
 }
 class RN{
