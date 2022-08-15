@@ -106,6 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
         this.result.add(te(i+1,r[i].selectedSlice,r[i]));
       }
     }
+    getRes();
+
 
   }
   saveIntervals(int index, String? interval, Slice slice){
@@ -253,94 +255,93 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+  var w;
+getRes() async {
+  Future<List> _futureOfList = handler.calculateResult();
+  List list = await _futureOfList ;
+  print(list);
+  double width = 98;
+   w = Container(
+     margin: const EdgeInsets.symmetric(vertical: 20.0),
+     height: 158.0,
+     alignment: Alignment.centerRight,
+     padding: const EdgeInsets.all(8.0),
+     child: ListView(
+       // This next line does the trick.
+       scrollDirection: Axis.horizontal,
+       children: <Widget>[
+         Container(
+           width: width,
+           color: Colors.blue,
+           child: Column(
+             mainAxisAlignment: MainAxisAlignment.spaceAround,
+             children: <Widget>[
+               Icon(
+                 Icons.public,
+                 color: Colors.black,
+                 size: 24.0,
+                 semanticLabel: 'Text to announce in accessibility modes',
+               ),
+               Text(list[0].toString()),
+             ],
+           ),
+         ),
+         Container(
+           width: width,
+           color: Colors.green,
+           child: Column(
+             mainAxisAlignment: MainAxisAlignment.spaceAround,
+             children:  <Widget>[
+               Icon(
+                 Icons.accessibility_new,
+                 color: Colors.black,
+                 size: 24.0,
+                 semanticLabel: 'Text to announce in accessibility modes',
+               ),
+               Text(list[1].toString()),
+             ],
+           ),
+         ),
+         Container(
+           width: width,
+           color: Colors.yellow,
+           child: Column(
+             mainAxisAlignment: MainAxisAlignment.spaceAround,
+             children: <Widget>[
+               Icon(
+                 Icons.undo,
+                 color: Colors.black,
+                 size: 24.0,
+                 semanticLabel: 'Text to announce in accessibility modes',
+               ),
+               Text(list[2].toString()),
+             ],
+           ),
+         ),
+         Container(
+           width: width,
+           color: Colors.orange,
+           child: Column(
+             mainAxisAlignment: MainAxisAlignment.spaceAround,
+             children:  <Widget>[
+               Icon(
+                 Icons.logout,
+                 color: Colors.black,
+                 size: 24.0,
+                 semanticLabel: 'Text to announce in accessibility modes',
+               ),
+               Text(list[3].toString()),
+             ],
+           ),
+         ),
+       ],
+     ),
+   );
+}
 
+   resultPage()  {
+     getRes();
 
-  Container resultPage(){
-    //var finalResult =  this.handler.calculateResult();
-    //String e = finalResult[0].toString();
-    //print(e);
-    double width = 98;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20.0),
-      height: 158.0,
-      alignment: Alignment.centerRight,
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-        // This next line does the trick.
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          Container(
-            width: width,
-            color: Colors.blue,
-        // cons.public
-        // accessibility_new
-        // undo
-        // logout
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Icon(
-                  Icons.public,
-                  color: Colors.black,
-                  size: 24.0,
-                  semanticLabel: 'Text to announce in accessibility modes',
-                ),
-
-                Text("9"),
-              ],
-            ),
-          ),
-          Container(
-            width: width,
-            color: Colors.green,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Icon(
-                  Icons.accessibility_new,
-                  color: Colors.black,
-                  size: 24.0,
-                  semanticLabel: 'Text to announce in accessibility modes',
-                ),
-                Text("100"),
-              ],
-            ),
-          ),
-          Container(
-            width: width,
-            color: Colors.yellow,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Icon(
-                  Icons.undo,
-                  color: Colors.black,
-                  size: 24.0,
-                  semanticLabel: 'Text to announce in accessibility modes',
-                ),
-                Text("100"),
-              ],
-            ),
-          ),
-          Container(
-            width: width,
-            color: Colors.orange,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const <Widget>[
-                Icon(
-                  Icons.logout,
-                  color: Colors.black,
-                  size: 24.0,
-                  semanticLabel: 'Text to announce in accessibility modes',
-                ),
-                Text("100"),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
     // return Container(
     //   height: 150,
     //   width: 200,
@@ -352,6 +353,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
+  //late Container finalResults;
   //int selectedIndex = -1;
 
   @override
@@ -367,6 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
           this.result.add(te(i + 1, t[i].selectedSlice, t[i]));
         }
       }
+     // this.finalResults = resultPage();
       setState(() {});
     });
   }
@@ -383,10 +386,13 @@ class _MyHomePageState extends State<MyHomePage> {
       body: FutureBuilder(
         future: this.handler.retrieveSlices(_selectedIndex),
         builder: (BuildContext context, AsyncSnapshot<List<Slice>> snapshot) {
+
           if (snapshot.hasData) {
+            print(snapshot.data?.length);
               if(_selectedIndex == 4 ){
-                return resultPage();
+                return w;
               }
+
 
               return raysPage(snapshot);
 
@@ -642,7 +648,7 @@ class DatabaseHandler {
   }
 
 
-   calculateResult() async{
+   Future<List> calculateResult() async{
     final db = await initializeDB();
     List finalResult = [0,0,0,0];
 
