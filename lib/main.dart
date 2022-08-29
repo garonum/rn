@@ -80,43 +80,44 @@ class _MyHomePageState extends State<MyHomePage> {
     "от приготовления напитка"];
 
 
-  // Future<String> _future;
-
   void _onItemTapped(int index) async{
+    //переключение между лучами
     _selectedIndex = index;
-    await updateresult();
+    //await updateresult();
     setState(() {
-
     });
   }
 
 
   setStateOfSlice(int index, int row, Slice slice){
+    // выбор среза
     slice.selectedSlice = row+1;
     this.handler.updateSlice(slice, _selectedIndex);
 
   }
-  updateresult() async {
-
-    this.result.clear();
-    var r =  await this.handler.retrieveSlices(_selectedIndex);
-
-    if (_selectedIndex != 4){
-      for (int i = 0; i < r.length; i++){
-        this.result.add(te(i+1,r[i].selectedSlice,r[i]));
-      }
-    }
-    getRes();
-
-
-  }
+//   updateresult() async {
+// //подготовка содержимого
+//     this.result.clear();
+//     var r =  await this.handler.retrieveSlices(_selectedIndex);
+//
+//     if (_selectedIndex != 4){
+//       for (int i = 0; i < r.length; i++){
+//         this.result.add(te(i+1,r[i].selectedSlice,r[i]));
+//       }
+//     }
+//     if(_selectedIndex == 4){
+//       getRes();
+//     }
+//
+//   }
   saveIntervals(int index, String? interval, Slice slice){
+    //запись выбранного интервала в базу
     slice.selectedInterval = interval!;
     this.handler.updateSlice(slice, _selectedIndex);
   }
-
-  List<Container> te(int index, int selectedSlice, Slice slice){
-
+  getChildrens(int index,AsyncSnapshot<List<Slice>> snapshot){
+    //собирает срезы и интервалы на основе полученных из бд данных
+    // возвращает все срезы  и интервалы в  виде списка контейнеров
     List<Container> x = [];
 
     var str = <String>[getTime[_selectedIndex],
@@ -137,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < data[_selectedIndex].length; i++){
 
       var s = false;
-      if (i+1 == selectedSlice){
+      if (i+1 == snapshot.data![index].selectedSlice){
         s = true;
       }
 
@@ -171,8 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
               )
           ),
           onTap: () async {
-            await setStateOfSlice(index, i, slice);
-            await updateresult();
+            await setStateOfSlice(index, i, snapshot.data![index]);
             setState(() {
 
             });
@@ -187,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
-          value: slice.selectedInterval,
+          value: snapshot.data![index].selectedInterval,
           icon: const Icon(Icons.arrow_downward),
           iconSize: 24,
           elevation: 16,
@@ -197,11 +197,9 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.deepPurpleAccent,
           ),
           onChanged: (String? newValue) async {
-            await saveIntervals(index, newValue, slice);
-            await updateresult();
+            await saveIntervals(index, newValue, snapshot.data![index]);
             setState(() {
 
-              // selectedIntervals[index] = newValue!;
             });
           },
           items:str
@@ -214,12 +212,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
     x.insert(x.length, d);
     return x;
-
   }
 
-  raysPage(AsyncSnapshot<List<Slice>> snapshot){
+  raysPage(AsyncSnapshot<List<Slice>> snapshot)  {
+    //возвращает страницу с лучами
     return ListView.builder(
-      itemCount:snapshot.data?.length,//data.length,//
+      itemCount:snapshot.data?.length,
       itemBuilder: (BuildContext context, int index) {
 
         return Dismissible(
@@ -230,10 +228,10 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: EdgeInsets.symmetric(horizontal: 10.0),
             child: Icon(Icons.delete_forever),
           ),
-          key: UniqueKey(),//ValueKey<int>(index),//(snapshot.data![index].id!),
+          key: UniqueKey(),
           onDismissed: (DismissDirection direction) async {
             await this.handler.deleteSlice(snapshot.data![index].id!, _selectedIndex);
-            await updateresult();
+            //await updateresult();
             setState(() {
               snapshot.data!.remove(snapshot.data![index]);
 
@@ -248,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.center,
             child: ListView(
               padding: const EdgeInsets.all(8),
-              children: this.result[index],
+              children: getChildrens(index, snapshot),//this.result[index],
             ),
           ),
         );
@@ -257,9 +255,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   var w;
 getRes() async {
+  //Возвращает страницу с результатами
   Future<List> _futureOfList = handler.calculateResult();
-  List list = await _futureOfList ;
-  print(list);
+  List list = await _futureOfList;
   double width = 98;
    w = Container(
      margin: const EdgeInsets.symmetric(vertical: 20.0),
@@ -339,43 +337,16 @@ getRes() async {
    );
 }
 
-   resultPage()  {
-     getRes();
-
-    // return Container(
-    //   height: 150,
-    //   width: 200,
-    //   color: Colors.green,
-    //   alignment: Alignment.center,
-    //   child: const Text('Container'),
-    // );
-  }
 
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
-  //late Container finalResults;
-  //int selectedIndex = -1;
 
   @override
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
-
-    this.handler.initializeDB().whenComplete(() async {
-      //await this.addSlices();
-      var t =  await this.handler.retrieveSlices(_selectedIndex);
-      if (_selectedIndex != 4) {
-        for (int i = 0; i < t.length; i++) {
-          this.result.add(te(i + 1, t[i].selectedSlice, t[i]));
-        }
-      }
-     // this.finalResults = resultPage();
-      setState(() {});
-    });
   }
-// getBody(){
-//     return
-// }
+
   @override
   Widget build(BuildContext context) {
 
@@ -388,11 +359,10 @@ getRes() async {
         builder: (BuildContext context, AsyncSnapshot<List<Slice>> snapshot) {
 
           if (snapshot.hasData) {
-            print(snapshot.data?.length);
+            //print(snapshot.data?.length);
               if(_selectedIndex == 4 ){
                 return w;
               }
-
 
               return raysPage(snapshot);
 
@@ -402,13 +372,11 @@ getRes() async {
         },
       ),
       floatingActionButton: Visibility(
-        visible: _selectedIndex != 4 ? true: false ,
+        visible: _selectedIndex != 4 ? true: false,
         child: FloatingActionButton(
           onPressed: () async {
             await addSlices();
-            await updateresult();
             setState(() {
-              //selectedIndex = 0;
             });
           },
           child: const Icon(Icons.add),
@@ -562,8 +530,8 @@ class DatabaseHandler {
       whereArgs: [slice.id],
     );
     final List<Map<String, Object?>> queryResult = await db.query(rayname[_selectedIndex]);
-    print("++++++++");
-    print(queryResult);
+   // print("++++++++");
+   print(queryResult);
     queryResult.map((e) => Slice.fromMap(e)).toList();
 
   }
@@ -654,29 +622,19 @@ class DatabaseHandler {
 
     for (int i = 0; i < rayname.length-1; i++){
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
-      //finalResult.add(queryResult);
-      //print(coefficientRayOfEarth[0]);
-      //print(queryResult);
       var x = queryResult.map((e) => Slice.fromMap(e)).toList();
-
       var d = x;
       if(d.length > 0 ){
         for (int e = 0; e < d.length; e++){
-          //var x = getRayCoefficient(rayname[i]);
-          //getRayCoefficient(rayname[i], d[e].selectedSlice.toInt());
           finalResult[i] =  finalResult[i] +(getRayCoefficient(rayname[i], d[e].selectedSlice.toInt()-1) * getIntervalCoefficient(d[e].selectedInterval)).toInt();//выбранный интеррвал перемножает
-          // print("!!");
-          // print(finalResult);
-          // print("!!");
-        }
 
+        }
       }else{
 
       }
 
-
     }
-    //print(finalResult);
+
   return finalResult;
   }
 }
