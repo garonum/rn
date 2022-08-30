@@ -26,10 +26,12 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(title: 'Луч Земли'),
     );
   }
+
 }
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, this.title}) : super(key: key);
+
   final String? title;
 
   @override
@@ -115,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
     slice.selectedInterval = interval!;
     this.handler.updateSlice(slice, _selectedIndex);
   }
-  getChildrens(int index,AsyncSnapshot<List<Slice>> snapshot){
+  getChildrens(int index,AsyncSnapshot<List<dynamic>> snapshot){
     //собирает срезы и интервалы на основе полученных из бд данных
     // возвращает все срезы  и интервалы в  виде списка контейнеров
     List<Container> x = [];
@@ -138,7 +140,8 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < data[_selectedIndex].length; i++){
 
       var s = false;
-      if (i+1 == snapshot.data![index].selectedSlice){
+
+      if (i+1 == snapshot.data![0]![index].selectedSlice){
         s = true;
       }
 
@@ -172,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
               )
           ),
           onTap: () async {
-            await setStateOfSlice(index, i, snapshot.data![index]);
+            await setStateOfSlice(index, i, snapshot.data![0]![index]);
             setState(() {
 
             });
@@ -187,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
-          value: snapshot.data![index].selectedInterval,
+          value: snapshot.data![0]![index].selectedInterval,
           icon: const Icon(Icons.arrow_downward),
           iconSize: 24,
           elevation: 16,
@@ -214,12 +217,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return x;
   }
 
-  raysPage(AsyncSnapshot<List<Slice>> snapshot)  {
+  raysPage(AsyncSnapshot<List<dynamic>> snapshot)  {
     //возвращает страницу с лучами
     return ListView.builder(
-      itemCount:snapshot.data?.length,
+      itemCount:snapshot.data![0].length,
       itemBuilder: (BuildContext context, int index) {
-
         return Dismissible(
           direction: DismissDirection.endToStart,
           background: Container(
@@ -253,13 +255,14 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-  var w;
-getRes() async {
+ // var w;
+getRes(AsyncSnapshot<List<dynamic>> snapshot) {
   //Возвращает страницу с результатами
-  Future<List> _futureOfList = handler.calculateResult();
-  List list = await _futureOfList;
+  // Future<List> _futureOfList = handler.calculateResult();
+  // List list = await _futureOfList;
   double width = 98;
-   w = Container(
+   //w =
+       return Container(
      margin: const EdgeInsets.symmetric(vertical: 20.0),
      height: 158.0,
      alignment: Alignment.centerRight,
@@ -280,7 +283,7 @@ getRes() async {
                  size: 24.0,
                  semanticLabel: 'Text to announce in accessibility modes',
                ),
-               Text(list[0].toString()),
+               Text(snapshot.data![1]![0].toString()),
              ],
            ),
          ),
@@ -296,7 +299,7 @@ getRes() async {
                  size: 24.0,
                  semanticLabel: 'Text to announce in accessibility modes',
                ),
-               Text(list[1].toString()),
+               Text(snapshot.data![1]![1].toString()),
              ],
            ),
          ),
@@ -312,7 +315,7 @@ getRes() async {
                  size: 24.0,
                  semanticLabel: 'Text to announce in accessibility modes',
                ),
-               Text(list[2].toString()),
+               Text(snapshot.data![1]![2].toString()),
              ],
            ),
          ),
@@ -328,7 +331,7 @@ getRes() async {
                  size: 24.0,
                  semanticLabel: 'Text to announce in accessibility modes',
                ),
-               Text(list[3].toString()),
+               Text(snapshot.data![1]![3].toString()),
              ],
            ),
          ),
@@ -355,13 +358,14 @@ getRes() async {
         title: Text(title[_selectedIndex]),//Text(widget.title!),
       ),
       body: FutureBuilder(
-        future: this.handler.retrieveSlices(_selectedIndex),
-        builder: (BuildContext context, AsyncSnapshot<List<Slice>> snapshot) {
+        future: Future.wait([this.handler.retrieveSlices(_selectedIndex), this.handler.calculateResult(), //Future that returns bool
+        ]),//this.handler.retrieveSlices(_selectedIndex),
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
 
           if (snapshot.hasData) {
             //print(snapshot.data?.length);
               if(_selectedIndex == 4 ){
-                return w;
+                return getRes(snapshot);
               }
 
               return raysPage(snapshot);
