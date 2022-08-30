@@ -232,10 +232,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           key: UniqueKey(),
           onDismissed: (DismissDirection direction) async {
-            await this.handler.deleteSlice(snapshot.data![index].id!, _selectedIndex);
+            await this.handler.deleteSlice(snapshot.data![0][index].id!, _selectedIndex);
             //await updateresult();
             setState(() {
-              snapshot.data!.remove(snapshot.data![index]);
+              snapshot.data![0].remove(snapshot.data![0][index]);
 
             });
           },
@@ -348,6 +348,7 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
+    this.handler.initializeDB();
   }
 
   @override
@@ -359,7 +360,7 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
       ),
       body: FutureBuilder(
         future: Future.wait([this.handler.retrieveSlices(_selectedIndex), this.handler.calculateResult(), //Future that returns bool
-        ]),//this.handler.retrieveSlices(_selectedIndex),
+        ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
 
           if (snapshot.hasData) {
@@ -378,9 +379,10 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
       floatingActionButton: Visibility(
         visible: _selectedIndex != 4 ? true: false,
         child: FloatingActionButton(
-          onPressed: () async {
-            await addSlices();
+          onPressed: ()  {
+            //await
             setState(() {
+              addSlices();
             });
           },
           child: const Icon(Icons.add),
@@ -460,7 +462,7 @@ class DatabaseHandler {
     String path = await getDatabasesPath();
 
     return openDatabase(
-      join(path, 'rn6.db'),
+      join(path, 'rn12.db'),
       onCreate: (database, version) async {
         await database.execute(
           "CREATE TABLE RayOfEarth(id INTEGER PRIMARY KEY AUTOINCREMENT, selectedSlice int, selectedInterval string)",
@@ -496,11 +498,11 @@ class DatabaseHandler {
   Future<List<Slice>> retrieveSlices(int _selectedIndex) async {
     final Database db = await initializeDB();
     List<Map<String, Object?>> queryResult = await db.query(rayname[_selectedIndex]);
-
-    return queryResult.map((e) => Slice.fromMap(e)).toList();
     print(")(");
     print(queryResult);
     print(")(");
+    return queryResult.map((e) => Slice.fromMap(e)).toList();
+
   }
 
   Future<void> deleteSlice(int id,int _selectedIndex) async {
