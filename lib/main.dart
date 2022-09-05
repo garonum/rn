@@ -200,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.deepPurpleAccent,
           ),
           onChanged: (String? newValue) async {
-            await saveIntervals(index, newValue, snapshot.data![index]);
+            await saveIntervals(index, newValue, snapshot.data![0]![index]);
             setState(() {
 
             });
@@ -261,6 +261,7 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
   // Future<List> _futureOfList = handler.calculateResult();
   // List list = await _futureOfList;
   double width = 98;
+
    //w =
        return Container(
      margin: const EdgeInsets.symmetric(vertical: 20.0),
@@ -362,18 +363,19 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
         future: Future.wait([this.handler.retrieveSlices(_selectedIndex), this.handler.calculateResult(), //Future that returns bool
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if(_selectedIndex == 4 ){
+            
+            return getRes(snapshot);
 
-          if (snapshot.hasData) {
-            //print(snapshot.data?.length);
-              if(_selectedIndex == 4 ){
-                return getRes(snapshot);
-              }
 
-              return raysPage(snapshot);
-
-          } else {
+          }
+          if(snapshot.hasData){
+            return raysPage(snapshot);
+          }else {
             return Center(child: CircularProgressIndicator());
           }
+
+
         },
       ),
       floatingActionButton: Visibility(
@@ -498,9 +500,9 @@ class DatabaseHandler {
   Future<List<Slice>> retrieveSlices(int _selectedIndex) async {
     final Database db = await initializeDB();
     List<Map<String, Object?>> queryResult = await db.query(rayname[_selectedIndex]);
-    print(")(");
-    print(queryResult);
-    print(")(");
+    // print(")(");
+    // print(queryResult);
+    // print(")(");
     return queryResult.map((e) => Slice.fromMap(e)).toList();
 
   }
@@ -537,7 +539,7 @@ class DatabaseHandler {
     );
     final List<Map<String, Object?>> queryResult = await db.query(rayname[_selectedIndex]);
    // print("++++++++");
-   print(queryResult);
+  // print(queryResult);
     queryResult.map((e) => Slice.fromMap(e)).toList();
 
   }
