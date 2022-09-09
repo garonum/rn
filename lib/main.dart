@@ -117,12 +117,12 @@ class _MyHomePageState extends State<MyHomePage> {
     slice.selectedInterval = interval!;
     this.handler.updateSlice(slice, _selectedIndex);
   }
-  getChildrens(int index,AsyncSnapshot<List<dynamic>> snapshot){
+  getChildrens(int index,AsyncSnapshot<List<dynamic>> snapshot, selectedIndex){
     //собирает срезы и интервалы на основе полученных из бд данных
     // возвращает все срезы  и интервалы в  виде списка контейнеров
     List<Container> x = [];
 
-    var str = <String>[getTime[_selectedIndex],
+    var str = <String>[getTime[selectedIndex],
       "От 1 с - до 5 мин",
       "От 5 мин - до 20 мин",
       "От 20 мин - до 1 ч",
@@ -137,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "От 6 мес - до 12 мес",
       "более года"];
 
-    for (int i = 0; i < data[_selectedIndex].length; i++){
+    for (int i = 0; i < data[selectedIndex].length; i++){
 
       var s = false;
 
@@ -165,11 +165,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 verticalDirection: VerticalDirection.up,
                 children: <Widget>[
-                  Text(data[_selectedIndex][i][0],
+                  Text(data[selectedIndex][i][0],
                       textDirection: TextDirection.ltr),
-                  Text(data[_selectedIndex][i][1],
+                  Text(data[selectedIndex][i][1],
                       textDirection: TextDirection.ltr),
-                  Text(data[_selectedIndex][i][2],
+                  Text(data[selectedIndex][i][2],
                       textDirection: TextDirection.ltr),
                 ],
               )
@@ -186,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     }
 
-
+print(snapshot.data![0]![index].selectedInterval);
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
@@ -216,6 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
     x.insert(x.length, d);
     return x;
   }
+
 
   raysPage(AsyncSnapshot<List<dynamic>> snapshot)  {
     //возвращает страницу с лучами
@@ -248,7 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.center,
             child: ListView(
               padding: const EdgeInsets.all(8),
-              children: getChildrens(index, snapshot),//this.result[index],
+              children: getChildrens(index, snapshot,_selectedIndex),//this.result[index],
             ),
           ),
         );
@@ -262,83 +263,86 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
   // List list = await _futureOfList;
   double width = 98;
 
-   //w =
-       return Container(
-     margin: const EdgeInsets.symmetric(vertical: 20.0),
-     height: 158.0,
-     alignment: Alignment.centerRight,
-     padding: const EdgeInsets.all(8.0),
-     child: ListView(
-       // This next line does the trick.
-       scrollDirection: Axis.horizontal,
-       children: <Widget>[
-         Container(
-           width: width,
-           color: Colors.blue,
-           child: Column(
-             mainAxisAlignment: MainAxisAlignment.spaceAround,
-             children: <Widget>[
-               Icon(
-                 Icons.public,
-                 color: Colors.black,
-                 size: 24.0,
-                 semanticLabel: 'Text to announce in accessibility modes',
-               ),
-               Text(snapshot.data![1]![0].toString()),
-             ],
-           ),
-         ),
-         Container(
-           width: width,
-           color: Colors.green,
-           child: Column(
-             mainAxisAlignment: MainAxisAlignment.spaceAround,
-             children:  <Widget>[
-               Icon(
-                 Icons.accessibility_new,
-                 color: Colors.black,
-                 size: 24.0,
-                 semanticLabel: 'Text to announce in accessibility modes',
-               ),
-               Text(snapshot.data![1]![1].toString()),
-             ],
-           ),
-         ),
-         Container(
-           width: width,
-           color: Colors.yellow,
-           child: Column(
-             mainAxisAlignment: MainAxisAlignment.spaceAround,
-             children: <Widget>[
-               Icon(
-                 Icons.undo,
-                 color: Colors.black,
-                 size: 24.0,
-                 semanticLabel: 'Text to announce in accessibility modes',
-               ),
-               Text(snapshot.data![1]![2].toString()),
-             ],
-           ),
-         ),
-         Container(
-           width: width,
-           color: Colors.orange,
-           child: Column(
-             mainAxisAlignment: MainAxisAlignment.spaceAround,
-             children:  <Widget>[
-               Icon(
-                 Icons.logout,
-                 color: Colors.black,
-                 size: 24.0,
-                 semanticLabel: 'Text to announce in accessibility modes',
-               ),
-               Text(snapshot.data![1]![3].toString()),
-             ],
-           ),
-         ),
-       ],
-     ),
-   );
+  //w =
+  if (snapshot.data != null){
+    if (snapshot.data![1] != null){
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20.0),
+      height: 158.0,
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
+        // This next line does the trick.
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          Container(
+            width: width,
+            color: Colors.blue,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Icon(
+                  Icons.public,
+                  color: Colors.black,
+                  size: 24.0,
+                  semanticLabel: 'Text to announce in accessibility modes',
+                ),
+                Text(snapshot.data![1]![0] != null ? snapshot.data![1]![0].toString() : "0"),
+              ],
+            ),
+          ),
+          Container(
+            width: width,
+            color: Colors.green,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Icon(
+                  Icons.accessibility_new,
+                  color: Colors.black,
+                  size: 24.0,
+                  semanticLabel: 'Text to announce in accessibility modes',
+                ),
+                Text(snapshot.data![1]![1] != null ? snapshot.data![1]![1].toString() : "0"),
+              ],
+            ),
+          ),
+          Container(
+            width: width,
+            color: Colors.yellow,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Icon(
+                  Icons.undo,
+                  color: Colors.black,
+                  size: 24.0,
+                  semanticLabel: 'Text to announce in accessibility modes',
+                ),
+                Text(snapshot.data![1]![2] != null ? snapshot.data![1]![2].toString() : "0"),
+              ],
+            ),
+          ),
+          Container(
+            width: width,
+            color: Colors.orange,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Icon(
+                  Icons.logout,
+                  color: Colors.black,
+                  size: 24.0,
+                  semanticLabel: 'Text to announce in accessibility modes',
+                ),
+                Text(snapshot.data![1]![3] != null ? snapshot.data![1]![3].toString() : "0"),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+}}
 }
 
 
@@ -363,13 +367,19 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
         future: Future.wait([this.handler.retrieveSlices(_selectedIndex), this.handler.calculateResult(), //Future that returns bool
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if(_selectedIndex == 4 ){
-            
-            return getRes(snapshot);
-
-
-          }
+          // if(_selectedIndex == 4 ){
+          //   if(check()){
+          //     return fullnessCheck();
+          //   }else{
+          //     return getRes(snapshot);
+          //   }
+          //
+          // }
           if(snapshot.hasData){
+            if(_selectedIndex == 4 ){
+              return getRes(snapshot);
+
+            }
             return raysPage(snapshot);
           }else {
             return Center(child: CircularProgressIndicator());
@@ -578,46 +588,58 @@ class DatabaseHandler {
   getIntervalCoefficient(String intetval){
 
     switch(intetval){
+      case "от получения продукта(из земли, воды итд)":
+      return 0;
+
+      case "от приготовления":
+      return 0;
+
+      case "от появления желания":
+      return 0;
+
+      case "от приготовления напитка":
+      return 0;
+
       case "От 1 с - до 5 мин":
         return 13;
-        break;
+
       case "От 5 мин - до 20 мин":
         return 12;
 
-        break;
+
       case "От 20 мин - до 1 ч":
         return 11;
-        break;
+
     case "От 1 ч - до 2 ч":
     return 10;
-    break;
+
     case "От 2 ч - до 6 ч":
     return 9;
-    break;
+
     case "От 6 ч - до 24 ч":
     return 8;
-    break;
+
     case "От 1 дня - до 2 дней":
     return 7;
-    break;
+
     case "От 2 дней - до 5 дней":
     return 6;
-    break;
+
     case "От 5 дней - до 7 дней":
     return 5;
-    break;
+
     case "От 1 недели - до 1 месяца":
       return 4;
-      break;
+
     case "От 1 месяца - до 6 мес.":
     return 3;
-    break;
+
     case "От 6 мес - до 12 мес":
     return 2;
-    break;
+
       case "более года":
         return 1;
-        break;
+
       default:
         return 0;
     }
@@ -628,17 +650,26 @@ class DatabaseHandler {
     final db = await initializeDB();
     List finalResult = [0,0,0,0];
 
-    for (int i = 0; i < rayname.length-1; i++){
+    for (int i = 0; i < rayname.length-1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
       var x = queryResult.map((e) => Slice.fromMap(e)).toList();
-      var d = x;
-      if(d.length > 0 ){
-        for (int e = 0; e < d.length; e++){
-          finalResult[i] =  finalResult[i] +(getRayCoefficient(rayname[i], d[e].selectedSlice.toInt()-1) * getIntervalCoefficient(d[e].selectedInterval)).toInt();//выбранный интеррвал перемножает
+      //var d = x;
+      if (x.isNotEmpty){
+        if (x.length > 0) {
+
+          for (int e = 0; e < x.length; e++) {
+           // print(x[e].selectedInterval);
+
+            finalResult[i] = finalResult[i] +
+                (getRayCoefficient(rayname[i], x[e].selectedSlice.toInt()) *
+                    getIntervalCoefficient(x[e].selectedInterval))
+                    .toInt();
+
+
+          }
+        } else {
 
         }
-      }else{
-
       }
 
     }
