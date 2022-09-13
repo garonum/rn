@@ -84,17 +84,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) async{
     //переключение между лучами
-    _selectedIndex = index;
-    //await updateresult();
+    // int index  = this.handler.getSelectedIndex();
+
+   // await
     setState(() {
+      this.handler.setIndex(index);
     });
   }
 
 
-  setStateOfSlice(int index, int row, Slice slice){
+  setStateOfSlice(int index, int row, Slice slice, int selectedIndex){
     // выбор среза
     slice.selectedSlice = row+1;
-    this.handler.updateSlice(slice, _selectedIndex);
+
+    this.handler.updateSlice(slice, selectedIndex);
 
   }
 //   updateresult() async {
@@ -112,17 +115,17 @@ class _MyHomePageState extends State<MyHomePage> {
 //     }
 //
 //   }
-  saveIntervals(int index, String? interval, Slice slice){
+  saveIntervals(int index, String? interval, Slice slice,int selectedIndex){
     //запись выбранного интервала в базу
     slice.selectedInterval = interval!;
-    this.handler.updateSlice(slice, _selectedIndex);
+    this.handler.updateSlice(slice, selectedIndex);
   }
-  getChildrens(int index,AsyncSnapshot<List<dynamic>> snapshot, selectedIndex){
+  getChildrens(int index,AsyncSnapshot<List<dynamic>> snapshot){
     //собирает срезы и интервалы на основе полученных из бд данных
     // возвращает все срезы  и интервалы в  виде списка контейнеров
     List<Container> x = [];
-
-    var str = <String>[getTime[selectedIndex],
+ //int selectedIndex = 0;
+     var str = <String>[getTime[snapshot.data![2][0]],
       "От 1 с - до 5 мин",
       "От 5 мин - до 20 мин",
       "От 20 мин - до 1 ч",
@@ -137,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "От 6 мес - до 12 мес",
       "более года"];
 
-    for (int i = 0; i < data[selectedIndex].length; i++){
+    for (int i = 0; i < data[snapshot.data![2][0]].length; i++){
 
       var s = false;
 
@@ -165,17 +168,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 verticalDirection: VerticalDirection.up,
                 children: <Widget>[
-                  Text(data[selectedIndex][i][0],
+                  Text(data[snapshot.data![2][0]][i][0],
                       textDirection: TextDirection.ltr),
-                  Text(data[selectedIndex][i][1],
+                  Text(data[snapshot.data![2][0]][i][1],
                       textDirection: TextDirection.ltr),
-                  Text(data[selectedIndex][i][2],
+                  Text(data[snapshot.data![2][0]][i][2],
                       textDirection: TextDirection.ltr),
                 ],
               )
           ),
           onTap: () async {
-            await setStateOfSlice(index, i, snapshot.data![0]![index]);
+            await setStateOfSlice(index, i, snapshot.data![0]![index],snapshot.data![2][0]);
             setState(() {
 
             });
@@ -186,7 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     }
 
-print(snapshot.data![0]![index].selectedInterval);
+//(snapshot.data![0]![index].selectedInterval);
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
@@ -200,7 +203,7 @@ print(snapshot.data![0]![index].selectedInterval);
             color: Colors.deepPurpleAccent,
           ),
           onChanged: (String? newValue) async {
-            await saveIntervals(index, newValue, snapshot.data![0]![index]);
+            await saveIntervals(index, newValue, snapshot.data![0]![index],snapshot.data![2][0]);
             setState(() {
 
             });
@@ -233,8 +236,8 @@ print(snapshot.data![0]![index].selectedInterval);
           ),
           key: UniqueKey(),
           onDismissed: (DismissDirection direction) async {
-            await this.handler.deleteSlice(snapshot.data![0][index].id!, _selectedIndex);
-            //await updateresult();
+            await this.handler.deleteSlice(snapshot.data![0][index].id!, snapshot.data![2][0]);
+
             setState(() {
               snapshot.data![0].remove(snapshot.data![0][index]);
 
@@ -249,7 +252,7 @@ print(snapshot.data![0]![index].selectedInterval);
             alignment: Alignment.center,
             child: ListView(
               padding: const EdgeInsets.all(8),
-              children: getChildrens(index, snapshot,_selectedIndex),//this.result[index],
+              children: getChildrens(index, snapshot),//this.result[index],
             ),
           ),
         );
@@ -361,25 +364,18 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title[_selectedIndex]),//Text(widget.title!),
+        title: Text(title[this.handler.getSelectedIndex()]),//Text(widget.title!),
       ),
       body: FutureBuilder(
-        future: Future.wait([this.handler.retrieveSlices(_selectedIndex), this.handler.calculateResult(), //Future that returns bool
+        future: Future.wait([this.handler.retrieveSlices(this.handler.getSelectedIndex()), this.handler.calculateResult(), this.handler.getIndex()//Future that returns bool
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-          // if(_selectedIndex == 4 ){
-          //   if(check()){
-          //     return fullnessCheck();
-          //   }else{
-          //     return getRes(snapshot);
-          //   }
-          //
-          // }
           if(snapshot.hasData){
-            if(_selectedIndex == 4 ){
+            if(snapshot.data![2][0] == 4 ){
               return getRes(snapshot);
 
             }
+
             return raysPage(snapshot);
           }else {
             return Center(child: CircularProgressIndicator());
@@ -389,12 +385,12 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
         },
       ),
       floatingActionButton: Visibility(
-        visible: _selectedIndex != 4 ? true: false,
+        visible: this.handler.getSelectedIndex() != 4 ? true: false,
         child: FloatingActionButton(
           onPressed: ()  {
             //await
             setState(() {
-              addSlices();
+              addSlices(this.handler.getSelectedIndex());
             });
           },
           child: const Icon(Icons.add),
@@ -425,18 +421,18 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
               backgroundColor: Colors.blue
           )
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: _selectedIndex,//this.handler.getSelectedIndex(),
         selectedItemColor: Colors.yellow,
         onTap: _onItemTapped,
       ),
     );
   }
 
-  Future<int> addSlices() async {
+  Future<int> addSlices(selectedIndex) async {
 
-    Slice firstSlice = Slice(selectedSlice: 0,selectedInterval: getTime[_selectedIndex]);
+    Slice firstSlice = Slice(selectedSlice: 0,selectedInterval: getTime[selectedIndex]);
     List<Slice> listOfSlices = [firstSlice];
-    return await this.handler.insertSlice(listOfSlices, _selectedIndex);
+    return await this.handler.insertSlice(listOfSlices, selectedIndex);
 
   }
 
@@ -676,6 +672,21 @@ class DatabaseHandler {
 
   return finalResult;
   }
+  int _selectedIndex = 0;
+  Future<List> getIndex() async{
+    List x = [_selectedIndex];
+    return x;
+  }
+   int getSelectedIndex() {
+    return _selectedIndex;
+
+  }
+  setIndex(int selectedIndex) async{
+    print(selectedIndex);
+    _selectedIndex = selectedIndex;
+
+  }
+
 }
 class RN{
 
