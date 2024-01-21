@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 void main() {
+
   runApp(MyApp());
 }
 
@@ -33,7 +34,7 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, this.title}) : super(key: key);
 
   final String? title;
-
+// типы компиляции
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -45,37 +46,38 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<List<List<String>>> data = [
     [
-      ["Фрукты, ягоды, сметана","Звездный План","Будущее"],
+      ["Фрукты, ягоды, сметана","Звёздный План","Будущее"],
       ["Овощи, сливочное масло","План Солнца","Настоящее"],
       ["Растительный белок, растительное масло","План Человека","Прошлое"],
-      ["Белок(Рыба, морепродукты), рыбий жир)","План Земли","Подсказки"]
+      ["Белок (рыба, морепродукты), рыбий жир","План Земли","Подсказки"]
     ],[
-      ["Взбитое, отжатое, замороженное","Закон Разума","Знаки"],
+      ["Взбитое, отжатое, замороженное","Закон разума","Знаки"],
       ["Пареное","Закон отображения","Подсветки"],
       ["Варёное","Закон отражения","Подсказки"],
-      ["Печеное","Закон выхода-возврата","Причины"],
-      ["Гриль, копченое","Закон легализации","Процессы"],
-      ["Жареноое","Закон замещения","Следствия"]
+      ["Печёное","Закон выхода-возврата","Причины"],
+      ["Гриль, копчёное","Закон легализации","Процессы"],
+      ["Жареное","Закон замещения","Следствия"]
     ],[
-      ["Семена","Плат Эффект","ЫЙИ-нить"],
-      ["Зерна","Плат Вселенский","Ритмологический рисунок из ЫЙИ"],
-      ["Плоды","Плат Знаний","Книга Озаригн"],
-      ["Цветы, мед","Плат Любви","Книга Радастея"],
-      ["Листья","Плат Славы","Книга Ирлем"],
+      ["Семена","плат эффект","ЫЙИ-нить"],
+      ["Зёрна","Плат Вселенский","Ритмологический рисунок из ЫЙИ"],
+      ["Плоды","Плат Знаний","Книга «Озаригн»"],
+      ["Цветы, мёд","Плат Любви","Книга «Радастея»"],
+      ["Листья","Плат Славы","Книга «ИРЛЕМ»"],
       ["Стебель","Плат Денег","Ритмический рисунок из ЫЙИ"],
       ["Корень","Плат Стыда","ЫЙИ"]
     ],[
       ["Чистая вода","План Оси",""],
-      ["Газированная вода(естественная газация)","План знакоряда",""],
-      ["Газированные напитки(искуственная газация)","План Обновления",""],
-      ["Заваренное кипятком(чай,кофе,кисель)","План Озаригн",""],
-      ["Соки","Плотный план",""],
-      ["Вареное в воде(компот),сыворотка","План Кристаллии",""],
-      ["Молоко всех видов","План Коралнеи",""],
-      ["Морс квас","План Звездолета",""],
-      ["Кисмолочные,йогурт","План полета",""]
+      ["Газированная вода (естественная газация)","План Знакоряда",""],
+      ["Газированные напитки (искуственная газация)","План Обновления",""],
+      ["Заваренное кипятком (чай, кофе, кисель)","План Озаригн",""],
+      ["Соки","Плотный План",""],
+      ["Варёное в воде (компот), сыворотка","План Кристаллии",""],
+      ["Молоко всех видов","План Кораллнеи",""],
+      ["Морс, квас","План Звездолёта",""],
+      ["Кисмолочные, йогурт","План Полёта",""]
     ]
   ];
+
   var getTime = ["от получения продукта(из земли, воды итд)",
     "от приготовления",
     "от появления желания",
@@ -85,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) async{
     //переключение между лучами
     // int index  = this.handler.getSelectedIndex();
-
+    _selectedIndex = index;
    // await
     setState(() {
       this.handler.setIndex(index);
@@ -95,26 +97,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   setStateOfSlice(int index, int row, Slice slice, int selectedIndex){
     // выбор среза
-    slice.selectedSlice = row+1;
 
+    //print(slice.selectedSlice);
+    slice.selectedSlice = row+1;
     this.handler.updateSlice(slice, selectedIndex);
 
   }
-//   updateresult() async {
-// //подготовка содержимого
-//     this.result.clear();
-//     var r =  await this.handler.retrieveSlices(_selectedIndex);
-//
-//     if (_selectedIndex != 4){
-//       for (int i = 0; i < r.length; i++){
-//         this.result.add(te(i+1,r[i].selectedSlice,r[i]));
-//       }
-//     }
-//     if(_selectedIndex == 4){
-//       getRes();
-//     }
-//
-//   }
+
   saveIntervals(int index, String? interval, Slice slice,int selectedIndex){
     //запись выбранного интервала в базу
     slice.selectedInterval = interval!;
@@ -171,7 +160,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   Text(data[snapshot.data![2][0]][i][0],
                       textDirection: TextDirection.ltr),
                   Text(data[snapshot.data![2][0]][i][1],
-                      textDirection: TextDirection.ltr),
+                      textDirection: TextDirection.ltr,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   Text(data[snapshot.data![2][0]][i][2],
                       textDirection: TextDirection.ltr),
                 ],
@@ -193,6 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
+          isExpanded: true,
           value: snapshot.data![0]![index].selectedInterval,
           icon: const Icon(Icons.arrow_downward),
           iconSize: 24,
@@ -212,7 +204,10 @@ class _MyHomePageState extends State<MyHomePage> {
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(value),
+              child: Padding(
+                padding: const EdgeInsets.only(left:15), //apply padding to some sides only
+                child: Text(value),
+              ),
             );
           }).toList(),
         ));
@@ -247,11 +242,11 @@ class _MyHomePageState extends State<MyHomePage> {
             constraints: BoxConstraints.expand(
               height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 + 395.0,
             ),
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(18.0),
             color: Colors.blue[600],
             alignment: Alignment.center,
             child: ListView(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(18),
               children: getChildrens(index, snapshot),//this.result[index],
             ),
           ),
@@ -370,7 +365,9 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
         future: Future.wait([this.handler.retrieveSlices(this.handler.getSelectedIndex()), this.handler.calculateResult(), this.handler.getIndex()//Future that returns bool
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+
           if(snapshot.hasData){
+
             if(snapshot.data![2][0] == 4 ){
               return getRes(snapshot);
 
@@ -407,6 +404,7 @@ getRes(AsyncSnapshot<List<dynamic>> snapshot) {
           ),BottomNavigationBarItem(
             icon: Icon(Icons.accessibility_new),
             label: 'Человека',
+              backgroundColor: Colors.blue
           ),BottomNavigationBarItem(
               icon: Icon(Icons.undo),
               label: 'Возврата',
@@ -552,11 +550,11 @@ class DatabaseHandler {
 
    int getRayCoefficient(String rayName, int slice){
 
-    final coefficientRayOfEarth = [7,14,20,27];
+    final coefficientRayOfEarth = [27,20,14,7];
 
-    final coefficientRayOfHuman = [5, 9, 14, 18, 23, 27];
+    final coefficientRayOfHuman = [27, 23, 18, 14, 9, 5];
 
-    final coefficientRayOfReturn = [4, 8, 12, 16, 20, 24, 27];
+    final coefficientRayOfReturn = [27, 24, 20, 16, 12, 8, 4];
 
     final coefficientRayOfExit = [27, 24, 21, 18, 15, 12, 9, 6, 3];
 
@@ -649,22 +647,20 @@ class DatabaseHandler {
     for (int i = 0; i < rayname.length-1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
       var x = queryResult.map((e) => Slice.fromMap(e)).toList();
-      //var d = x;
       if (x.isNotEmpty){
         if (x.length > 0) {
 
           for (int e = 0; e < x.length; e++) {
-           // print(x[e].selectedInterval);
+              if(x[e].selectedSlice == 0){
+                finalResult[i] = finalResult[i] + 0;
+              }else{
+                finalResult[i] = finalResult[i] +
+                    (getRayCoefficient(rayname[i], x[e].selectedSlice.toInt()-1) *
+                        getIntervalCoefficient(x[e].selectedInterval));
 
-            finalResult[i] = finalResult[i] +
-                (getRayCoefficient(rayname[i], x[e].selectedSlice.toInt()) *
-                    getIntervalCoefficient(x[e].selectedInterval))
-                    .toInt();
-
+              }
 
           }
-        } else {
-
         }
       }
 
@@ -682,7 +678,7 @@ class DatabaseHandler {
 
   }
   setIndex(int selectedIndex) async{
-    print(selectedIndex);
+   // print(selectedIndex);
     _selectedIndex = selectedIndex;
 
   }
