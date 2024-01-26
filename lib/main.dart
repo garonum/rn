@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         ).copyWith(
           secondary: Colors.green,
         ),
-        textTheme: const TextTheme(bodyText2: TextStyle(color: Colors.purple)),
+        textTheme: const TextTheme(bodyText2: TextStyle(color: Colors.black)),
         //primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Луч Земли'),
@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<String> title = ["Луч Земли","Луч Человека","Луч Возврата","Луч Выхода","Итог"];
   int _selectedIndex = 0;
-
+  List<List<String>> revertNumbersOfSlices =[['4','3','2','1'],['6','5','4','3','2','1',],['7','6','5','4','3','2','1',],['1','2','3','4','5','6','7','8','9']];
   List<List<List<String>>> data = [
     [
       ["Фрукты, ягоды, сметана","Звёздный План","Будущее"],
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ["Варёное в воде (компот), сыворотка","План Кристаллии",""],
       ["Молоко всех видов","План Кораллнеи",""],
       ["Морс, квас","План Звездолёта",""],
-      ["Кисмолочные, йогурт","План Полёта",""]
+      ["Кисломолочные, йогурт","План Полёта",""]
     ]
   ];
 
@@ -87,10 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) async{
     //переключение между лучами
     // int index  = this.handler.getSelectedIndex();
-    _selectedIndex = index;
+     _selectedIndex = index;
    // await
-    setState(() {
-      this.handler.setIndex(index);
+    setState(()  {
+       this.handler.setIndex(index);
     });
   }
 
@@ -129,58 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "От 6 мес - до 12 мес",
       "более года"];
 
-    for (int i = 0; i < data[snapshot.data![2][0]].length; i++){
-
-      var s = false;
-
-      if (i+1 == snapshot.data![0]![index].selectedSlice){
-        s = true;
-      }
-
-
-      x.insert(x.length, Container(
-
-        height: 96,
-
-        color: s ? Colors.yellow : Colors.orange,
-
-        child:  ListTile(
-          selected: s,
-          tileColor: Colors.white,
-          //selectedTileColor: Colors.black,
-          title: Container(
-
-              padding: EdgeInsets.all(10),
-              color: Colors.transparent,
-              child:Column(
-                textDirection: TextDirection.ltr,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                verticalDirection: VerticalDirection.up,
-                children: <Widget>[
-                  Text(data[snapshot.data![2][0]][i][0],
-                      textDirection: TextDirection.ltr),
-                  Text(data[snapshot.data![2][0]][i][1],
-                      textDirection: TextDirection.ltr,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(data[snapshot.data![2][0]][i][2],
-                      textDirection: TextDirection.ltr),
-                ],
-              )
-          ),
-          onTap: () async {
-            await setStateOfSlice(index, i, snapshot.data![0]![index],snapshot.data![2][0]);
-            setState(() {
-
-            });
-
-          },
-        ),
-      ));
-
-    }
-
-//(snapshot.data![0]![index].selectedInterval);
+    //(snapshot.data![0]![index].selectedInterval);
     var d = Container(height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
@@ -190,10 +139,10 @@ class _MyHomePageState extends State<MyHomePage> {
           iconSize: 24,
           elevation: 16,
           style: const TextStyle(color: Colors.deepPurple),
-          underline: Container(
-            height: 2,
-            color: Colors.deepPurpleAccent,
-          ),
+          // underline: Container(
+          //   height: 2,
+          //   color: Colors.deepPurpleAccent,
+          // ),
           onChanged: (String? newValue) async {
             await saveIntervals(index, newValue, snapshot.data![0]![index],snapshot.data![2][0]);
             setState(() {
@@ -212,6 +161,42 @@ class _MyHomePageState extends State<MyHomePage> {
           }).toList(),
         ));
     x.insert(x.length, d);
+
+
+    for (int i = 0; i < data[snapshot.data![2][0]].length; i++){
+
+      var s = false;
+
+      if (i+1 == snapshot.data![0]![index].selectedSlice){
+        s = true;
+      }
+
+
+      x.insert(x.length, Container(
+
+        height: 96,
+
+        color: s ? Colors.yellow : Colors.blue,
+
+        child: GestureDetector(
+          onTap: () async {
+            await setStateOfSlice(index, i, snapshot.data![0]![index],snapshot.data![2][0]);
+            setState(() {
+
+            });
+
+          },
+          child: CustomList(
+            numberOfSlice: revertNumbersOfSlices[snapshot.data![2][0]][i].toString(),
+            firstParametr: data[snapshot.data![2][0]][i][0],
+            secondParametr: data[snapshot.data![2][0]][i][1],
+            thirdParametr: data[snapshot.data![2][0]][i][2],
+          ),
+        )
+      ));
+
+    }
+
     return x;
   }
 
@@ -243,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 + 395.0,
             ),
             padding: const EdgeInsets.all(18.0),
-            color: Colors.blue[600],
+            //color: Colors.,
             alignment: Alignment.center,
             child: ListView(
               padding: const EdgeInsets.all(18),
@@ -684,8 +669,102 @@ class DatabaseHandler {
   }
 
 }
-class RN{
+class _SliceDescription extends StatelessWidget {
+  const _SliceDescription({
+    required this.firstParametr,
+    required this.secondParametr,
+    required this.thirdParametr,
 
+  });
+
+  final String firstParametr;
+  final String secondParametr;
+  final String thirdParametr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          firstParametr,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Padding(padding: EdgeInsets.only(bottom: 2.0)),
+        Text(
+          secondParametr,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 12.0,
+            color: Colors.black54,
+          ),
+        ),
+        Text(
+          thirdParametr,
+          style: const TextStyle(
+            fontSize: 12.0,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+class CustomList extends StatelessWidget {
+  const CustomList({
+    required this.numberOfSlice,
+    required this.firstParametr,
+    required this.secondParametr,
+    required this.thirdParametr,
+
+  });
+
+  final String numberOfSlice;
+  final String firstParametr;
+  final String secondParametr;
+  final String thirdParametr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: SizedBox(
+        height: 100,
+
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 2.0, 0.0),
+                child: Center(
+                child:CircleAvatar(
+                  backgroundColor: const Color(0xff764abc),
+                  child: Text(numberOfSlice),
+                )
+            )),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
+                child: _SliceDescription(
+                  firstParametr: firstParametr,
+                  secondParametr: secondParametr,
+                  thirdParametr: thirdParametr,
+
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 
