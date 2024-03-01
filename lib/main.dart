@@ -47,23 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   List<List<String>> revertNumbersOfSlices = [
     ['4', '3', '2', '1'],
-    [
-      '6',
-      '5',
-      '4',
-      '3',
-      '2',
-      '1',
-    ],
-    [
-      '7',
-      '6',
-      '5',
-      '4',
-      '3',
-      '2',
-      '1',
-    ],
+    ['6', '5', '4', '3', '2', '1',],
+    ['7', '6', '5', '4', '3', '2', '1',],
     ['1', '2', '3', '4', '5', '6', '7', '8', '9']
   ];
   List<List<List<String>>> data = [
@@ -200,8 +185,10 @@ class _MyHomePageState extends State<MyHomePage> {
           x.length,
           Container(
               height: 96,
+              width: 300,
               color: s ? Colors.yellow : Colors.blue,
               child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () async {
                   await setStateOfSlice(index, i, snapshot.data![0]![index],
                       snapshot.data![2][0]);
@@ -266,7 +253,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // Future<List> _futureOfList = handler.calculateResult();
     // List list = await _futureOfList;
     double width = 98;
-
+    List<TableCell> res = [];
+//print(snapshot.data![1]![1][0].length);
+//print(snapshot.data![1]![1]);
+    //for (int i = 0; i < snapshot.data![1]![0].length; i++) {}
     //w =
     if (snapshot.data != null) {
       if (snapshot.data![1] != null) {
@@ -295,8 +285,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 semanticLabel:
                                     'Text to announce in accessibility modes',
                               ),
-                              Text(snapshot.data![1]![0] != null
-                                  ? snapshot.data![1]![0].toString()
+                              Text(snapshot.data![1]![0][0] != null
+                                  ? snapshot.data![1]![0][0].toString()
                                   : "0"),
                             ],
                           ),
@@ -316,8 +306,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               semanticLabel:
                                   'Text to announce in accessibility modes',
                             ),
-                            Text(snapshot.data![1]![1] != null
-                                ? snapshot.data![1]![1].toString()
+                            Text(snapshot.data![1][0][1] != null
+                                ? snapshot.data![1][0][1]!.toString()
                                 : "0"),
                           ],
                         ),
@@ -336,8 +326,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 semanticLabel:
                                     'Text to announce in accessibility modes',
                               ),
-                              Text(snapshot.data![1]![2] != null
-                                  ? snapshot.data![1]![2].toString()
+                              Text(snapshot.data![1]![0][2] != null
+                                  ? snapshot.data![1]![0][2].toString()
                                   : "0"),
                             ],
                           ),
@@ -357,8 +347,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               semanticLabel:
                                   'Text to announce in accessibility modes',
                             ),
-                            Text(snapshot.data![1]![3] != null
-                                ? snapshot.data![1]![3].toString()
+                            Text(snapshot.data![1]![0][3] != null
+                                ? snapshot.data![1]![0][3].toString()
                                 : "0"),
                           ],
                         ),
@@ -374,48 +364,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   Table(
                     border: TableBorder.all(),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    children: <TableRow>[
-                      TableRow(
-                        decoration: const BoxDecoration(
-                          color: Colors.yellow,
-                        ),
-                        children: <Widget>[
-                          Container(
-                            child: Text("1*8/"),
-                          ),
-                          TableCell(
-                            child:Container(
-                              color: Colors.blue,
-                              child:Text("1*8/"),
-                            ),
-                          ),
-                          TableCell(
-                            child:Text("1*8/"),
-                          ),
-                          TableCell(
-                            child:Text("1*8/"),
-                          ),
-
-                        ],
-                      ),
-                      TableRow(
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                        ),
-                        children: <Widget>[
-                          Text("1*8/3=87kfjhkdjhfkjhvk"),
-                          Text("1*8/3=87"),
-                          TableCell(
-                            child:Text("1*8/"),
-                          ),
-                          TableCell(
-                            child:Text("1*8/"),
-                          ),
-                        ],
-                      ),
-
-                    ],
+                    children:gtr(snapshot),
                   ),
+
                   SizedBox(height: 5.0),
                   new Container(
                     margin: EdgeInsets.only(left: 10.0, right: 10.0),
@@ -428,7 +379,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.only(
                           left: 15.0, right: 15.0, top: 8.0),
                       child: Text(
-                        'Invoiced Products',
+                        'Очисть все.(В разработке)',
                         style: TextStyle(
                             fontFamily: 'Quicksand',
                             fontSize: 20.0,
@@ -447,7 +398,71 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
+  List<TableRow> gtr(AsyncSnapshot<List<dynamic>> snapshot){
+    List<TableRow> x = [
+      TableRow(
+        decoration: const BoxDecoration(
+          color: Colors.blue,
+        ),
+        children: <Widget>[
+          Container(
+            child: Text("Земли"),
+          ),
+          TableCell(
+            child: Container(
+              color: Colors.blue,
+              child: Text("Человека"),
+            ),
+          ),
+          TableCell(
+            child: Text("Возврата"),
+          ),
+          TableCell(
+            child: Text("Выхода"),
+          ),
+        ],
+      ),
+    ];
+    int maxLength = 0;
+    maxLength >= snapshot.data![3][0].length ? 0 : maxLength = snapshot.data![3][0].length;
+    maxLength >= snapshot.data![3][1].length ? 0 : maxLength = snapshot.data![3][1].length;
+    maxLength >= snapshot.data![3][2].length ? 0 : maxLength = snapshot.data![3][2].length;
+    maxLength >= snapshot.data![3][3].length ? 0 : maxLength = snapshot.data![3][3].length;
 
+    for (int i = 0; i < maxLength; i++) {
+
+      TableRow tr;
+      Text text1;
+      Text text2;
+      Text text3;
+      Text text4;
+      // if (snapshot.data![3][0].isNotEmpty){
+      //     if (snapshot.data![3][0][0]){}
+      // }
+      snapshot.data![3][0].asMap().containsKey(i) ? text1 =  Text(snapshot.data![3][0][i]) : text1 = const Text('');
+      snapshot.data![3][1].asMap().containsKey(i) ? text2 =  Text(snapshot.data![3][1][i]) : text2 =const Text('');
+      snapshot.data![3][2].asMap().containsKey(i) ? text3 = Text(snapshot.data![3][2][i]) : text3 =  Text('');
+      snapshot.data![3][3].asMap().containsKey(i) ? text4 =  Text(snapshot.data![3][3][i]) : text4 = const Text('');
+
+      tr = TableRow(
+        decoration: const BoxDecoration(
+          color: Colors.blue,
+        ),
+        children: <Widget>[
+          text1,
+          text2,
+          TableCell(
+            child: text3,
+          ),
+          TableCell(
+            child: text4,
+          ),
+        ],
+      );
+      x.insert(x.length, tr);
+    }
+    return x;
+}
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
 
@@ -469,7 +484,8 @@ class _MyHomePageState extends State<MyHomePage> {
         future: Future.wait([
           this.handler.retrieveSlices(this.handler.getSelectedIndex()),
           this.handler.calculateResult(),
-          this.handler.getIndex()
+          this.handler.getIndex(),
+          this.handler.resultsForATable()
           //Future that returns bool
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
@@ -734,7 +750,36 @@ class DatabaseHandler {
 
   Future<List> calculateResult() async {
     final db = await initializeDB();
-    List finalResult = [0, 0, 0, 0];
+    //List finalResult = [0, 0, 0, 0];
+    List<List<dynamic>> finalResult = [[0,0,0,0],[[''],[''],[''],['']]];
+    for (int i = 0; i < rayname.length - 1; i++) {
+      final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
+      var x = queryResult.map((e) => Slice.fromMap(e)).toList();
+      if (x.isNotEmpty) {
+        if (x.length > 0) {
+          for (int e = 0; e < x.length; e++) {
+            if (x[e].selectedSlice == 0) {
+              finalResult[0][i] = finalResult[0][i] + 0;
+            } else {
+              int rc =getRayCoefficient(
+                  rayname[i], x[e].selectedSlice.toInt() - 1);
+              int ri = getIntervalCoefficient(x[e].selectedInterval);
+              int fr = rc * ri;
+              finalResult[1][i]="$rc * $ri =$fr";
+              finalResult[0][i] = finalResult[0][i] + fr ;
+
+            }
+          }
+        }
+      }
+    }
+
+    return finalResult;
+  }
+  Future<List> resultsForATable() async {
+    final db = await initializeDB();
+    //List finalResult = [0, 0, 0, 0];
+    List<List<String>> finalResult = [[],[],[],[]];
 
     for (int i = 0; i < rayname.length - 1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
@@ -743,12 +788,15 @@ class DatabaseHandler {
         if (x.length > 0) {
           for (int e = 0; e < x.length; e++) {
             if (x[e].selectedSlice == 0) {
-              finalResult[i] = finalResult[i] + 0;
+              finalResult[i] = finalResult[i];
             } else {
-              finalResult[i] = finalResult[i] +
-                  (getRayCoefficient(
-                          rayname[i], x[e].selectedSlice.toInt() - 1) *
-                      getIntervalCoefficient(x[e].selectedInterval));
+              int rc =getRayCoefficient(
+                  rayname[i], x[e].selectedSlice.toInt() - 1);
+              int ri = getIntervalCoefficient(x[e].selectedInterval);
+              int fr = rc * ri;
+              finalResult[i].insert(finalResult[i].length, "$rc * $ri =$fr");
+              //finalResult[0][i] = finalResult[0][i] + fr ;
+
             }
           }
         }
@@ -838,7 +886,7 @@ class CustomList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: SizedBox(
+      child: Stack(children: [SizedBox(
         height: 100,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -847,9 +895,9 @@ class CustomList extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(10.0, 0.0, 2.0, 0.0),
                 child: Center(
                     child: CircleAvatar(
-                  backgroundColor: const Color(0xff764abc),
-                  child: Text(numberOfSlice),
-                ))),
+                      backgroundColor: const Color(0xff764abc),
+                      child: Text(numberOfSlice),
+                    ))),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
@@ -862,7 +910,7 @@ class CustomList extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ),],)
     );
   }
 }
