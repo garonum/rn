@@ -463,6 +463,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return x;
 }
+
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
 
@@ -677,7 +678,6 @@ class DatabaseHandler {
         break;
       case 'RayOfHuman':
         return coefficientRayOfHuman[slice].toInt();
-
         break;
       case 'RayOfReturn':
         return coefficientRayOfReturn[slice].toInt();
