@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.blue,
         ).copyWith(
@@ -37,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<String> mealsName = [];
   List<String> title = [
     "Луч Земли",
     "Луч Человека",
@@ -141,8 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
       "более года"
     ];
 
+
     //(snapshot.data![0]![index].selectedInterval);
-    var d = Container(
+    var intervals = Container(
         height: 77,
         color: Colors.blue,
         child: DropdownButton<String>(
@@ -172,7 +175,39 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           }).toList(),
         ));
-    x.insert(x.length, d);
+    x.insert(x.length, intervals);
+
+    var slices = Container(
+        height: 77,
+        color: Colors.blue,
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: snapshot.data![0]![index].selectedInterval,
+          icon: const Icon(Icons.arrow_downward),
+          iconSize: 24,
+          elevation: 16,
+          style: const TextStyle(color: Colors.deepPurple),
+          // underline: Container(
+          //   height: 2,
+          //   color: Colors.deepPurpleAccent,
+          // ),
+          onChanged: (String? newValue) async {
+            await saveIntervals(index, newValue, snapshot.data![0]![index],
+                snapshot.data![2][0]);
+            setState(() {});
+          },
+          items: str.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15),
+                //apply padding to some sides only
+                child: Text(value),
+              ),
+            );
+          }).toList(),
+        ));
+    x.insert(x.length, slices);
 
     for (int i = 0; i < data[snapshot.data![2][0]].length; i++) {
       var s = false;
@@ -207,6 +242,223 @@ class _MyHomePageState extends State<MyHomePage> {
     return x;
   }
 
+  getChildrensNew(int index) {
+    //собирает срезы и интервалы на основе полученных из бд данных
+    // возвращает все срезы  и интервалы в  виде списка контейнеров
+    List<Widget> x = [];
+    //int selectedIndex = 0;
+    var _intervals = <String>[
+      getTime[0],
+      "От 1 с - до 5 мин",
+      "От 5 мин - до 20 мин",
+      "От 20 мин - до 1 ч",
+      "От 1 ч - до 2 ч",
+      "От 2 ч - до 6 ч",
+      "От 6 ч - до 24 ч",
+      "От 1 дня - до 2 дней",
+      "От 2 дней - до 5 дней",
+      "От 5 дней - до 7 дней",
+      "От 1 недели - до 1 месяца",
+      "От 1 месяца - до 6 мес.",
+      "От 6 мес - до 12 мес",
+      "более года"
+    ];
+    var _slices = <String>[
+      getTime[0],
+      "Указать срез"
+    ];
+    var mealField = Container(
+
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10,top: 5, bottom: 5),
+        //apply padding to some sides only
+        child: TextField(
+          decoration: new InputDecoration.collapsed(
+            hintText: 'Название продукта',
+          ),
+          onChanged: (text) {
+            //тут нужно добавить отправку текста в бд
+            print('First text field: $text (${text.characters.length})');
+
+          },
+        ),
+      )
+    );
+    x.insert(x.length, mealField);
+    x.insert(x.length, const SizedBox(height: 5,));
+    //(snapshot.data![0]![index].selectedInterval);
+
+    var intervals = Container(
+
+        //height: 77,
+        color: Colors.blue,
+        child:DropdownMenu<String>(
+
+          initialSelection: getTime[0],
+          onSelected: (String? value) {
+            // This is called when the user selects an item.
+            setState(() {
+              //dropdownValue = value!;
+            });
+          },
+          dropdownMenuEntries: _intervals.map<DropdownMenuEntry<String>>((String value) {
+            return DropdownMenuEntry<String>(value: value, label: value);
+          }).toList(),
+        ),
+        // DropdownButton<String>(
+        //   isExpanded: true,
+        //   value: 'более года',//snapshot.data![0]![index].selectedInterval,
+        //   icon: const Icon(Icons.arrow_downward),
+        //   iconSize: 24,
+        //   elevation: 16,
+        //   style: const TextStyle(color: Colors.deepPurple),
+        //   // underline: Container(
+        //   //   height: 2,
+        //   //   color: Colors.deepPurpleAccent,
+        //   // ),
+        //   onChanged: (String? newValue) async {
+        //     // await saveIntervals(index, newValue, snapshot.data![0]![index],
+        //     //     snapshot.data![2][0]);
+        //     setState(() {});
+        //   },
+        //   items: _intervals.map<DropdownMenuItem<String>>((String value) {
+        //     return DropdownMenuItem<String>(
+        //       value: value,
+        //       child: Padding(
+        //         padding: const EdgeInsets.only(left: 15),
+        //         //apply padding to some sides only
+        //         child: Text(value),
+        //       ),
+        //     );
+        //   }).toList(),
+        // )
+    );
+    x.insert(x.length, intervals);
+    x.insert(x.length, const SizedBox(height: 5,));
+
+    var slices = Container(
+      color: Colors.blue,
+      child: DropdownMenu<String>(
+        expandedInsets: EdgeInsets.zero,
+        inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              gapPadding: 5,
+            )),
+        initialSelection: "Указать срез",
+        onSelected: (String? value) {
+          // This is called when the user selects an item.
+          setState(() {
+            //dropdownValue = value!;
+          });
+        },
+        dropdownMenuEntries: _slices.map<DropdownMenuEntry<String>>((String value) {
+          return DropdownMenuEntry<String>(value: value, label: value,labelWidget: Container(
+            child: CircleAvatar(
+              backgroundColor: Color(0xff764abc),
+              child: Text('0'),
+            ),
+          ),
+
+          );
+        }).toList(),
+      ),
+
+
+
+      // DropdownButton<String>(
+      //   isExpanded: true,
+      //   value: 'более года',//snapshot.data![0]![index].selectedInterval,
+      //   icon: const Icon(Icons.arrow_downward),
+      //   iconSize: 24,
+      //   elevation: 16,
+      //   style: const TextStyle(color: Colors.deepPurple),
+      //   // underline: Container(
+      //   //   height: 2,
+      //   //   color: Colors.deepPurpleAccent,
+      //   // ),
+      //   onChanged: (String? newValue) async {
+      //     // await saveIntervals(index, newValue, snapshot.data![0]![index],
+      //     //     snapshot.data![2][0]);
+      //     setState(() {});
+      //   },
+      //   items: _intervals.map<DropdownMenuItem<String>>((String value) {
+      //     return DropdownMenuItem<String>(
+      //       value: value,
+      //       child: Padding(
+      //         padding: const EdgeInsets.only(left: 15),
+      //         //apply padding to some sides only
+      //         child: Text(value),
+      //       ),
+      //     );
+      //   }).toList(),
+      // )
+    );
+    // Container(
+    //     height: 77,
+    //     color: Colors.lightBlue,
+    //     child: DropdownButton<String>(
+    //       isExpanded: true,
+    //       value: 'Фрукты, ягоды, сметана.',//snapshot.data![0]![index].selectedInterval,
+    //       icon: const Icon(Icons.arrow_downward),
+    //       iconSize: 24,
+    //       elevation: 16,
+    //       style: const TextStyle(color: Colors.deepPurple),
+    //       // underline: Container(
+    //       //   height: 2,
+    //       //   color: Colors.deepPurpleAccent,
+    //       // ),
+    //       onChanged: (String? newValue) async {
+    //         // await saveIntervals(index, newValue, snapshot.data![0]![index],
+    //         //     snapshot.data![2][0]);
+    //         setState(() {});
+    //       },
+    //       items: _slices.map<DropdownMenuItem<String>>((String value) {
+    //         return DropdownMenuItem<String>(
+    //           value: value,
+    //           child: Padding(
+    //             padding: const EdgeInsets.only(left: 15),
+    //             //apply padding to some sides only
+    //             child: Text(value),
+    //           ),
+    //         );
+    //       }).toList(),
+    //     ));
+    x.insert(x.length, slices);
+
+    // for (int i = 0; i < data[snapshot.data![2][0]].length; i++) {
+    //   var s = false;
+    //
+    //   if (i + 1 == snapshot.data![0]![index].selectedSlice) {
+    //     s = true;
+    //   }
+    //
+    //   x.insert(
+    //       x.length,
+    //       Container(
+    //           height: 96,
+    //           width: 300,
+    //           color: s ? Colors.yellow : Colors.blue,
+    //           child: GestureDetector(
+    //             behavior: HitTestBehavior.translucent,
+    //             onTap: () async {
+    //               await setStateOfSlice(index, i, snapshot.data![0]![index],
+    //                   snapshot.data![2][0]);
+    //               setState(() {});
+    //             },
+    //             child: CustomList(
+    //               numberOfSlice:
+    //               revertNumbersOfSlices[snapshot.data![2][0]][i].toString(),
+    //               firstParametr: data[snapshot.data![2][0]][i][0],
+    //               secondParametr: data[snapshot.data![2][0]][i][1],
+    //               thirdParametr: data[snapshot.data![2][0]][i][2],
+    //             ),
+    //           )));
+    // }
+
+    return x;
+  }
+
   raysPage(AsyncSnapshot<List<dynamic>> snapshot) {
     //возвращает страницу с лучами
     return ListView.builder(
@@ -230,16 +482,17 @@ class _MyHomePageState extends State<MyHomePage> {
             });
           },
           child: Container(
-            constraints: BoxConstraints.expand(
-              height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
-                  395.0,
-            ),
-            padding: const EdgeInsets.all(18.0),
+            // constraints: BoxConstraints.expand(
+            //   height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
+            //       95.0,
+            // ),
+            padding: const EdgeInsets.all(8.0),
             //color: Colors.,
             alignment: Alignment.center,
             child: ListView(
-              padding: const EdgeInsets.all(18),
-              children: getChildrens(index, snapshot), //this.result[index],
+
+              //padding: const EdgeInsets.all(8),
+              children: getChildrensNew(index), //this.result[index],
             ),
           ),
         );
@@ -472,6 +725,24 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     this.handler = DatabaseHandler();
     this.handler.initializeDB();
+    this.handler.retrieveSlices(_selectedIndex)
+    .then((result) {
+      List<Slice> slices = result;
+
+    for (var map in slices) {
+
+
+      // print(map.selectedInterval);
+      // print(map.selectedSlice);
+      // print(map.activity);
+    }
+    setState(() {
+    // for (var map in result) {
+    // //activity[map.key]= map.activity == 0 ? false: true;
+    // // print(map.activity);
+    // }
+    });
+    });
   }
 
   @override
@@ -481,26 +752,62 @@ class _MyHomePageState extends State<MyHomePage> {
         title:
             Text(title[this.handler.getSelectedIndex()]), //Text(widget.title!),
       ),
-      body: FutureBuilder(
-        future: Future.wait([
-          this.handler.retrieveSlices(this.handler.getSelectedIndex()),
-          this.handler.calculateResult(),
-          this.handler.getIndex(),
-          this.handler.resultsForATable()
-          //Future that returns bool
-        ]),
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data![2][0] == 4) {
-              return getRes(snapshot);
-            }
+      body: ListView.builder(
+        itemCount: 1,
+        itemBuilder: (BuildContext context, int index) {
+          return Dismissible(
+            direction: DismissDirection.endToStart,
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.symmetric(horizontal: 0.0),
+              child: Icon(Icons.delete_forever),
+            ),
+            key: UniqueKey(),
+            onDismissed: (DismissDirection direction) async {
+              // await this.handler.deleteSlice(
+              //     snapshot.data![0][index].id!, snapshot.data![2][0]);
 
-            return raysPage(snapshot);
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
+              setState(() {
+                //snapshot.data![0].remove(snapshot.data![0][index]);
+              });
+            },
+            child: Container(
+              constraints: BoxConstraints.expand(
+                height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
+                    250.0,
+              ),
+              padding: const EdgeInsets.all(10.0),
+              //color: Colors.,
+              alignment: Alignment.center,
+              child: ListView(
+                padding: const EdgeInsets.all(0),
+                children: getChildrensNew(index), //this.result[index],
+              ),
+            ),
+          );
         },
       ),
+      // body: FutureBuilder(
+      //   future: Future.wait([
+      //     this.handler.retrieveSlices(this.handler.getSelectedIndex()),
+      //     this.handler.calculateResult(),
+      //     this.handler.getIndex(),
+      //     this.handler.resultsForATable()
+      //     //Future that returns bool
+      //   ]),
+      //   builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+      //     if (snapshot.hasData) {
+      //       if (snapshot.data![2][0] == 4) {
+      //         return getRes(snapshot);
+      //       }
+      //
+      //       return raysPage(snapshot);
+      //     } else {
+      //       return Center(child: CircularProgressIndicator());
+      //     }
+      //   },
+      // ),
       floatingActionButton: Visibility(
         visible: this.handler.getSelectedIndex() != 4 ? true : false,
         child: FloatingActionButton(
@@ -911,6 +1218,62 @@ class CustomList extends StatelessWidget {
           ],
         ),
       ),],)
+    );
+  }
+}
+class MyCustomForm extends StatefulWidget {
+  const MyCustomForm({super.key});
+
+  @override
+  State<MyCustomForm> createState() => _MyCustomFormState();
+}
+class _MyCustomFormState extends State<MyCustomForm> {
+  // Create a text controller and use it to retrieve the current value
+  // of the TextField.
+  final myController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Start listening to changes.
+    myController.addListener(_printLatestValue);
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the widget tree.
+    // This also removes the _printLatestValue listener.
+    myController.dispose();
+    super.dispose();
+  }
+
+  void _printLatestValue() {
+    final text = myController.text;
+    print('Second text field: $text (${text.characters.length})');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Retrieve Text Input'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              onChanged: (text) {
+                print('First text field: $text (${text.characters.length})');
+              },
+            ),
+            TextField(
+              controller: myController,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
