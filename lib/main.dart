@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:rn/data.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,466 +41,165 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<String> mealsName = [];
-  List<String> title = [
-    "Луч Земли",
-    "Луч Человека",
-    "Луч Возврата",
-    "Луч Выхода",
-    "Итог"
-  ];
+  List<String> title = Data.title;
   int _selectedIndex = 0;
-  List<List<String>> revertNumbersOfSlices = [
-    ['4', '3', '2', '1'],
-    ['6', '5', '4', '3', '2', '1',],
-    ['7', '6', '5', '4', '3', '2', '1',],
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-  ];
-  List<List<List<String>>> data = [
-    [
-      ["Фрукты, ягоды, сметана", "Звёздный План", "Будущее"],
-      ["Овощи, сливочное масло", "План Солнца", "Настоящее"],
-      ["Растительный белок, растительное масло", "План Человека", "Прошлое"],
-      ["Белок (рыба, морепродукты), рыбий жир", "План Земли", "Подсказки"]
-    ],
-    [
-      ["Взбитое, отжатое, замороженное", "Закон разума", "Знаки"],
-      ["Пареное", "Закон отображения", "Подсветки"],
-      ["Варёное", "Закон отражения", "Подсказки"],
-      ["Печёное", "Закон выхода-возврата", "Причины"],
-      ["Гриль, копчёное", "Закон легализации", "Процессы"],
-      ["Жареное", "Закон замещения", "Следствия"]
-    ],
-    [
-      ["Семена", "плат эффект", "ЫЙИ-нить"],
-      ["Зёрна", "Плат Вселенский", "Ритмологический рисунок из ЫЙИ"],
-      ["Плоды", "Плат Знаний", "Книга «Озаригн»"],
-      ["Цветы, мёд", "Плат Любви", "Книга «Радастея»"],
-      ["Листья", "Плат Славы", "Книга «ИРЛЕМ»"],
-      ["Стебель", "Плат Денег", "Ритмический рисунок из ЫЙИ"],
-      ["Корень", "Плат Стыда", "ЫЙИ"]
-    ],
-    [
-      ["Чистая вода", "План Оси", ""],
-      ["Газированная вода (естественная газация)", "План Знакоряда", ""],
-      ["Газированные напитки (искуственная газация)", "План Обновления", ""],
-      ["Заваренное кипятком (чай, кофе, кисель)", "План Озаригн", ""],
-      ["Соки", "Плотный План", ""],
-      ["Варёное в воде (компот), сыворотка", "План Кристаллии", ""],
-      ["Молоко всех видов", "План Кораллнеи", ""],
-      ["Морс, квас", "План Звездолёта", ""],
-      ["Кисломолочные, йогурт", "План Полёта", ""]
-    ]
-  ];
+  List<List<String>> revertNumbersOfSlices = Data.revertNumbersOfSlices;
+  List<List<List<String>>> data = Data.data;
+  var getTime = Data.getTime;
 
-  var getTime = [
-    "от получения продукта(из земли, воды итд)",
-    "от приготовления",
-    "от появления желания",
-    "от приготовления напитка"
-  ];
-
-  void _onItemTapped(int index) async {
+  void switchBetweenRays(int index) async {
     //переключение между лучами
     // int index  = this.handler.getSelectedIndex();
     _selectedIndex = index;
-    // await
+    await this.handler.retrieveSlices(_selectedIndex).then((result) {
+      // loading = false;
+      dataFromDB = result;
+    });
     setState(() {
       this.handler.setIndex(index);
     });
   }
 
-  setStateOfSlice(int index, int row, Slice slice, int selectedIndex) {
-    // выбор среза
-
-    //print(slice.selectedSlice);
-    slice.selectedSlice = row + 1;
-    this.handler.updateSlice(slice, selectedIndex);
-  }
-
-  saveIntervals(int index, String? interval, Slice slice, int selectedIndex) {
+  saveIntervals(String? interval, Slice slice, int selectedIndex) async {
     //запись выбранного интервала в базу
     slice.selectedInterval = interval!;
-    this.handler.updateSlice(slice, selectedIndex);
+    await this.handler.updateSlice(slice, selectedIndex);
   }
 
-  getChildrens(int index, AsyncSnapshot<List<dynamic>> snapshot) {
-    //собирает срезы и интервалы на основе полученных из бд данных
-    // возвращает все срезы  и интервалы в  виде списка контейнеров
-    List<Container> x = [];
-    //int selectedIndex = 0;
-    var str = <String>[
-      getTime[snapshot.data![2][0]],
-      "От 1 с - до 5 мин",
-      "От 5 мин - до 20 мин",
-      "От 20 мин - до 1 ч",
-      "От 1 ч - до 2 ч",
-      "От 2 ч - до 6 ч",
-      "От 6 ч - до 24 ч",
-      "От 1 дня - до 2 дней",
-      "От 2 дней - до 5 дней",
-      "От 5 дней - до 7 дней",
-      "От 1 недели - до 1 месяца",
-      "От 1 месяца - до 6 мес.",
-      "От 6 мес - до 12 мес",
-      "более года"
-    ];
-
-
-    //(snapshot.data![0]![index].selectedInterval);
-    var intervals = Container(
-        height: 77,
-        color: Colors.blue,
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: snapshot.data![0]![index].selectedInterval,
-          icon: const Icon(Icons.arrow_downward),
-          iconSize: 24,
-          elevation: 16,
-          style: const TextStyle(color: Colors.deepPurple),
-          // underline: Container(
-          //   height: 2,
-          //   color: Colors.deepPurpleAccent,
-          // ),
-          onChanged: (String? newValue) async {
-            await saveIntervals(index, newValue, snapshot.data![0]![index],
-                snapshot.data![2][0]);
-            setState(() {});
-          },
-          items: str.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 15),
-                //apply padding to some sides only
-                child: Text(value),
-              ),
-            );
-          }).toList(),
-        ));
-    x.insert(x.length, intervals);
-
-    var slices = Container(
-        height: 77,
-        color: Colors.blue,
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: snapshot.data![0]![index].selectedInterval,
-          icon: const Icon(Icons.arrow_downward),
-          iconSize: 24,
-          elevation: 16,
-          style: const TextStyle(color: Colors.deepPurple),
-          // underline: Container(
-          //   height: 2,
-          //   color: Colors.deepPurpleAccent,
-          // ),
-          onChanged: (String? newValue) async {
-            await saveIntervals(index, newValue, snapshot.data![0]![index],
-                snapshot.data![2][0]);
-            setState(() {});
-          },
-          items: str.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 15),
-                //apply padding to some sides only
-                child: Text(value),
-              ),
-            );
-          }).toList(),
-        ));
-    x.insert(x.length, slices);
-
-    for (int i = 0; i < data[snapshot.data![2][0]].length; i++) {
-      var s = false;
-
-      if (i + 1 == snapshot.data![0]![index].selectedSlice) {
-        s = true;
-      }
-
-      x.insert(
-          x.length,
-          Container(
-              height: 96,
-              width: 300,
-              color: s ? Colors.yellow : Colors.blue,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () async {
-                  await setStateOfSlice(index, i, snapshot.data![0]![index],
-                      snapshot.data![2][0]);
-                  setState(() {});
-                },
-                child: CustomList(
-                  numberOfSlice:
-                      revertNumbersOfSlices[snapshot.data![2][0]][i].toString(),
-                  firstParametr: data[snapshot.data![2][0]][i][0],
-                  secondParametr: data[snapshot.data![2][0]][i][1],
-                  thirdParametr: data[snapshot.data![2][0]][i][2],
-                ),
-              )));
-    }
-
-    return x;
+  saveSlice(String? sliceNumber, Slice slice, int selectedIndex) async {
+    //запись выбранного интервала в базу
+    slice.selectedSlice = sliceNumber!;
+    await this.handler.updateSlice(slice, selectedIndex);
   }
 
-  getChildrensNew(int index) {
+  saveMealName(String? mealName, Slice slice, int selectedIndex) async {
+    //запись выбранного интервала в базу
+    slice.mealName = mealName!;
+    await this.handler.updateSlice(slice, selectedIndex);
+  }
+
+  getChildrensNew(int index, List<Slice> d) {
     //собирает срезы и интервалы на основе полученных из бд данных
     // возвращает все срезы  и интервалы в  виде списка контейнеров
     List<Widget> x = [];
     //int selectedIndex = 0;
-    var _intervals = <String>[
-      getTime[0],
-      "От 1 с - до 5 мин",
-      "От 5 мин - до 20 мин",
-      "От 20 мин - до 1 ч",
-      "От 1 ч - до 2 ч",
-      "От 2 ч - до 6 ч",
-      "От 6 ч - до 24 ч",
-      "От 1 дня - до 2 дней",
-      "От 2 дней - до 5 дней",
-      "От 5 дней - до 7 дней",
-      "От 1 недели - до 1 месяца",
-      "От 1 месяца - до 6 мес.",
-      "От 6 мес - до 12 мес",
-      "более года"
-    ];
-    var _slices = <String>[
-      getTime[0],
-      "Указать срез"
-    ];
+    var _intervals = Data().getIntervals(_selectedIndex);
     var mealField = Container(
-
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10,top: 5, bottom: 5),
-        //apply padding to some sides only
-        child: TextField(
-          decoration: new InputDecoration.collapsed(
-            hintText: 'Название продукта',
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, top: 5, bottom: 5),
+          //apply padding to some sides only
+          child: TextField(
+            controller: TextEditingController(text: dataFromDB[index].mealName),
+            decoration: new InputDecoration.collapsed(
+              hintText: 'Название продукта',
+            ),
+            onSubmitted: (text) async {
+              dataFromDB[index].mealName = text;
+              await saveMealName(text, d[index], _selectedIndex);
+              await this.handler.retrieveSlices(_selectedIndex).then((result) {
+                // loading = false;
+                dataFromDB = result;
+              });
+            },
           ),
-          onChanged: (text) {
-            //тут нужно добавить отправку текста в бд
-            print('First text field: $text (${text.characters.length})');
-
-          },
-        ),
-      )
-    );
+        ));
     x.insert(x.length, mealField);
-    x.insert(x.length, const SizedBox(height: 5,));
-    //(snapshot.data![0]![index].selectedInterval);
+    x.insert(
+        x.length,
+        const SizedBox(
+          height: 5,
+        ));
 
     var intervals = Container(
-
-        //height: 77,
-        color: Colors.blue,
-        child:DropdownMenu<String>(
-
-          initialSelection: getTime[0],
-          onSelected: (String? value) {
-            // This is called when the user selects an item.
-            setState(() {
-              //dropdownValue = value!;
-            });
-          },
-          dropdownMenuEntries: _intervals.map<DropdownMenuEntry<String>>((String value) {
-            return DropdownMenuEntry<String>(value: value, label: value);
-          }).toList(),
-        ),
-        // DropdownButton<String>(
-        //   isExpanded: true,
-        //   value: 'более года',//snapshot.data![0]![index].selectedInterval,
-        //   icon: const Icon(Icons.arrow_downward),
-        //   iconSize: 24,
-        //   elevation: 16,
-        //   style: const TextStyle(color: Colors.deepPurple),
-        //   // underline: Container(
-        //   //   height: 2,
-        //   //   color: Colors.deepPurpleAccent,
-        //   // ),
-        //   onChanged: (String? newValue) async {
-        //     // await saveIntervals(index, newValue, snapshot.data![0]![index],
-        //     //     snapshot.data![2][0]);
-        //     setState(() {});
-        //   },
-        //   items: _intervals.map<DropdownMenuItem<String>>((String value) {
-        //     return DropdownMenuItem<String>(
-        //       value: value,
-        //       child: Padding(
-        //         padding: const EdgeInsets.only(left: 15),
-        //         //apply padding to some sides only
-        //         child: Text(value),
-        //       ),
-        //     );
-        //   }).toList(),
-        // )
+      //height: 77,
+      color: Colors.blue,
+      child: DropdownMenu<String>(
+        expandedInsets: EdgeInsets.zero,
+        initialSelection: dataFromDB[index].selectedInterval,
+        onSelected: (String? value) async {
+          // This is called when the user selects an item.
+          await saveIntervals(value, dataFromDB[index], _selectedIndex);
+          await this.handler.retrieveSlices(_selectedIndex).then((result) {
+            // loading = false;
+            dataFromDB = result;
+          });
+          setState(() {
+            //dropdownValue = value!;
+          });
+        },
+        dropdownMenuEntries:
+            _intervals.map<DropdownMenuEntry<String>>((String value) {
+          return DropdownMenuEntry<String>(value: value, label: value);
+        }).toList(),
+      ),
     );
     x.insert(x.length, intervals);
-    x.insert(x.length, const SizedBox(height: 5,));
+    x.insert(
+        x.length,
+        const SizedBox(
+          height: 5,
+        ));
 
+
+    var i = 0;
     var slices = Container(
       color: Colors.blue,
       child: DropdownMenu<String>(
         expandedInsets: EdgeInsets.zero,
         inputDecorationTheme: InputDecorationTheme(
             border: OutlineInputBorder(
-              gapPadding: 5,
-            )),
-        initialSelection: "Указать срез",
-        onSelected: (String? value) {
+          gapPadding: 5,
+        )),
+        initialSelection: dataFromDB[index].selectedSlice,
+        onSelected: (String? value) async {
           // This is called when the user selects an item.
+          //dropdownValue = value!;
+          // This is called when the user selects an item.
+          await saveSlice(value, dataFromDB[index], _selectedIndex);
+          await this.handler.retrieveSlices(_selectedIndex).then((result) {
+            // loading = false;
+            dataFromDB = result;
+          });
           setState(() {
-            //dropdownValue = value!;
+            setState(() {
+              //dropdownValue = value!;
+            });
           });
         },
-        dropdownMenuEntries: _slices.map<DropdownMenuEntry<String>>((String value) {
-          return DropdownMenuEntry<String>(value: value, label: value,labelWidget: Container(
-            child: CircleAvatar(
-              backgroundColor: Color(0xff764abc),
-              child: Text('0'),
-            ),
-          ),
+        dropdownMenuEntries:
+            Data.slicesData[_selectedIndex].map<DropdownMenuEntry<String>>((String value) {
+          if (value != "Указать срез") {
+            i++;
+          }
 
-          );
+          return DropdownMenuEntry<String>(
+              value: value,
+              label: value,
+              labelWidget: Row(
+                children: [
+                  value != "Указать срез"
+                      ? Container(
+                          child: CircleAvatar(
+                            backgroundColor: Color(0xff764abc),
+                            child: Text(i.toString()),
+                          ),
+                        )
+                      : SizedBox(
+                          width: 10,
+                        ),
+                  SizedBox(width: 5),
+                  Text(value),
+                ],
+              ));
         }).toList(),
       ),
-
-
-
-      // DropdownButton<String>(
-      //   isExpanded: true,
-      //   value: 'более года',//snapshot.data![0]![index].selectedInterval,
-      //   icon: const Icon(Icons.arrow_downward),
-      //   iconSize: 24,
-      //   elevation: 16,
-      //   style: const TextStyle(color: Colors.deepPurple),
-      //   // underline: Container(
-      //   //   height: 2,
-      //   //   color: Colors.deepPurpleAccent,
-      //   // ),
-      //   onChanged: (String? newValue) async {
-      //     // await saveIntervals(index, newValue, snapshot.data![0]![index],
-      //     //     snapshot.data![2][0]);
-      //     setState(() {});
-      //   },
-      //   items: _intervals.map<DropdownMenuItem<String>>((String value) {
-      //     return DropdownMenuItem<String>(
-      //       value: value,
-      //       child: Padding(
-      //         padding: const EdgeInsets.only(left: 15),
-      //         //apply padding to some sides only
-      //         child: Text(value),
-      //       ),
-      //     );
-      //   }).toList(),
-      // )
     );
-    // Container(
-    //     height: 77,
-    //     color: Colors.lightBlue,
-    //     child: DropdownButton<String>(
-    //       isExpanded: true,
-    //       value: 'Фрукты, ягоды, сметана.',//snapshot.data![0]![index].selectedInterval,
-    //       icon: const Icon(Icons.arrow_downward),
-    //       iconSize: 24,
-    //       elevation: 16,
-    //       style: const TextStyle(color: Colors.deepPurple),
-    //       // underline: Container(
-    //       //   height: 2,
-    //       //   color: Colors.deepPurpleAccent,
-    //       // ),
-    //       onChanged: (String? newValue) async {
-    //         // await saveIntervals(index, newValue, snapshot.data![0]![index],
-    //         //     snapshot.data![2][0]);
-    //         setState(() {});
-    //       },
-    //       items: _slices.map<DropdownMenuItem<String>>((String value) {
-    //         return DropdownMenuItem<String>(
-    //           value: value,
-    //           child: Padding(
-    //             padding: const EdgeInsets.only(left: 15),
-    //             //apply padding to some sides only
-    //             child: Text(value),
-    //           ),
-    //         );
-    //       }).toList(),
-    //     ));
     x.insert(x.length, slices);
-
-    // for (int i = 0; i < data[snapshot.data![2][0]].length; i++) {
-    //   var s = false;
-    //
-    //   if (i + 1 == snapshot.data![0]![index].selectedSlice) {
-    //     s = true;
-    //   }
-    //
-    //   x.insert(
-    //       x.length,
-    //       Container(
-    //           height: 96,
-    //           width: 300,
-    //           color: s ? Colors.yellow : Colors.blue,
-    //           child: GestureDetector(
-    //             behavior: HitTestBehavior.translucent,
-    //             onTap: () async {
-    //               await setStateOfSlice(index, i, snapshot.data![0]![index],
-    //                   snapshot.data![2][0]);
-    //               setState(() {});
-    //             },
-    //             child: CustomList(
-    //               numberOfSlice:
-    //               revertNumbersOfSlices[snapshot.data![2][0]][i].toString(),
-    //               firstParametr: data[snapshot.data![2][0]][i][0],
-    //               secondParametr: data[snapshot.data![2][0]][i][1],
-    //               thirdParametr: data[snapshot.data![2][0]][i][2],
-    //             ),
-    //           )));
-    // }
 
     return x;
   }
 
-  raysPage(AsyncSnapshot<List<dynamic>> snapshot) {
-    //возвращает страницу с лучами
-    return ListView.builder(
-      itemCount: snapshot.data![0].length,
-      itemBuilder: (BuildContext context, int index) {
-        return Dismissible(
-          direction: DismissDirection.endToStart,
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
-            child: Icon(Icons.delete_forever),
-          ),
-          key: UniqueKey(),
-          onDismissed: (DismissDirection direction) async {
-            await this.handler.deleteSlice(
-                snapshot.data![0][index].id!, snapshot.data![2][0]);
-
-            setState(() {
-              snapshot.data![0].remove(snapshot.data![0][index]);
-            });
-          },
-          child: Container(
-            // constraints: BoxConstraints.expand(
-            //   height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
-            //       95.0,
-            // ),
-            padding: const EdgeInsets.all(8.0),
-            //color: Colors.,
-            alignment: Alignment.center,
-            child: ListView(
-
-              //padding: const EdgeInsets.all(8),
-              children: getChildrensNew(index), //this.result[index],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   // var w;
   getRes(AsyncSnapshot<List<dynamic>> snapshot) {
@@ -617,9 +318,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   Table(
                     border: TableBorder.all(),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    children:gtr(snapshot),
+                    children: gtr(snapshot),
                   ),
-
                   SizedBox(height: 5.0),
                   new Container(
                     margin: EdgeInsets.only(left: 10.0, right: 10.0),
@@ -651,7 +351,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
   }
-  List<TableRow> gtr(AsyncSnapshot<List<dynamic>> snapshot){
+
+  List<TableRow> gtr(AsyncSnapshot<List<dynamic>> snapshot) {
     List<TableRow> x = [
       TableRow(
         decoration: const BoxDecoration(
@@ -677,13 +378,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     ];
     int maxLength = 0;
-    maxLength >= snapshot.data![3][0].length ? 0 : maxLength = snapshot.data![3][0].length;
-    maxLength >= snapshot.data![3][1].length ? 0 : maxLength = snapshot.data![3][1].length;
-    maxLength >= snapshot.data![3][2].length ? 0 : maxLength = snapshot.data![3][2].length;
-    maxLength >= snapshot.data![3][3].length ? 0 : maxLength = snapshot.data![3][3].length;
+    maxLength >= snapshot.data![3][0].length
+        ? 0
+        : maxLength = snapshot.data![3][0].length;
+    maxLength >= snapshot.data![3][1].length
+        ? 0
+        : maxLength = snapshot.data![3][1].length;
+    maxLength >= snapshot.data![3][2].length
+        ? 0
+        : maxLength = snapshot.data![3][2].length;
+    maxLength >= snapshot.data![3][3].length
+        ? 0
+        : maxLength = snapshot.data![3][3].length;
 
     for (int i = 0; i < maxLength; i++) {
-
       TableRow tr;
       Text text1;
       Text text2;
@@ -692,10 +400,18 @@ class _MyHomePageState extends State<MyHomePage> {
       // if (snapshot.data![3][0].isNotEmpty){
       //     if (snapshot.data![3][0][0]){}
       // }
-      snapshot.data![3][0].asMap().containsKey(i) ? text1 =  Text(snapshot.data![3][0][i]) : text1 = const Text('');
-      snapshot.data![3][1].asMap().containsKey(i) ? text2 =  Text(snapshot.data![3][1][i]) : text2 =const Text('');
-      snapshot.data![3][2].asMap().containsKey(i) ? text3 = Text(snapshot.data![3][2][i]) : text3 =  Text('');
-      snapshot.data![3][3].asMap().containsKey(i) ? text4 =  Text(snapshot.data![3][3][i]) : text4 = const Text('');
+      snapshot.data![3][0].asMap().containsKey(i)
+          ? text1 = Text(snapshot.data![3][0][i])
+          : text1 = const Text('');
+      snapshot.data![3][1].asMap().containsKey(i)
+          ? text2 = Text(snapshot.data![3][1][i])
+          : text2 = const Text('');
+      snapshot.data![3][2].asMap().containsKey(i)
+          ? text3 = Text(snapshot.data![3][2][i])
+          : text3 = Text('');
+      snapshot.data![3][3].asMap().containsKey(i)
+          ? text4 = Text(snapshot.data![3][3][i])
+          : text4 = const Text('');
 
       tr = TableRow(
         decoration: const BoxDecoration(
@@ -715,165 +431,204 @@ class _MyHomePageState extends State<MyHomePage> {
       x.insert(x.length, tr);
     }
     return x;
-}
+  }
 
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
+  late List<Slice> dataFromDB;
+  bool loading = true;
 
   @override
   void initState() {
     super.initState();
     this.handler = DatabaseHandler();
     this.handler.initializeDB();
-    this.handler.retrieveSlices(_selectedIndex)
-    .then((result) {
-      List<Slice> slices = result;
+    this.handler.retrieveSlices(_selectedIndex).then((result) {
+      loading = false;
+      dataFromDB = result;
 
-    for (var map in slices) {
-
-
-      // print(map.selectedInterval);
-      // print(map.selectedSlice);
-      // print(map.activity);
-    }
-    setState(() {
-    // for (var map in result) {
-    // //activity[map.key]= map.activity == 0 ? false: true;
-    // // print(map.activity);
-    // }
-    });
+      for (var map in dataFromDB) {
+        // print(map.selectedInterval);
+        // print(map.selectedSlice);
+        // print(map.activity);
+      }
+      setState(() {
+        // for (var map in result) {
+        // //activity[map.key]= map.activity == 0 ? false: true;
+        // // print(map.activity);
+        // }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text(title[this.handler.getSelectedIndex()]), //Text(widget.title!),
-      ),
-      body: ListView.builder(
-        itemCount: 1,
-        itemBuilder: (BuildContext context, int index) {
-          return Dismissible(
-            direction: DismissDirection.endToStart,
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 0.0),
-              child: Icon(Icons.delete_forever),
+    if (loading) {
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text("Загружается..."), //Text(widget.title!),
+          ),
+          body: const Center(
+            child: LinearProgressIndicator(
+              value: 0.5,
+              backgroundColor: Colors.lightBlue,
+              color: Colors.white,
             ),
-            key: UniqueKey(),
-            onDismissed: (DismissDirection direction) async {
-              // await this.handler.deleteSlice(
-              //     snapshot.data![0][index].id!, snapshot.data![2][0]);
-
-              setState(() {
-                //snapshot.data![0].remove(snapshot.data![0][index]);
-              });
-            },
-            child: Container(
-              constraints: BoxConstraints.expand(
-                height: Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
-                    250.0,
-              ),
-              padding: const EdgeInsets.all(10.0),
-              //color: Colors.,
-              alignment: Alignment.center,
-              child: ListView(
-                padding: const EdgeInsets.all(0),
-                children: getChildrensNew(index), //this.result[index],
-              ),
-            ),
-          );
-        },
-      ),
-      // body: FutureBuilder(
-      //   future: Future.wait([
-      //     this.handler.retrieveSlices(this.handler.getSelectedIndex()),
-      //     this.handler.calculateResult(),
-      //     this.handler.getIndex(),
-      //     this.handler.resultsForATable()
-      //     //Future that returns bool
-      //   ]),
-      //   builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-      //     if (snapshot.hasData) {
-      //       if (snapshot.data![2][0] == 4) {
-      //         return getRes(snapshot);
-      //       }
-      //
-      //       return raysPage(snapshot);
-      //     } else {
-      //       return Center(child: CircularProgressIndicator());
-      //     }
-      //   },
-      // ),
-      floatingActionButton: Visibility(
-        visible: this.handler.getSelectedIndex() != 4 ? true : false,
-        child: FloatingActionButton(
-          onPressed: () {
-            //await
-            setState(() {
-              addSlices(this.handler.getSelectedIndex());
-            });
-          },
-          child: const Icon(Icons.add),
-          backgroundColor: Colors.green,
+          ));
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+              title[this.handler.getSelectedIndex()]), //Text(widget.title!),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.public),
-              label: 'Земли',
-              backgroundColor: Colors.blue),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.accessibility_new),
-              label: 'Человека',
-              backgroundColor: Colors.blue),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.undo),
-              label: 'Возврата',
-              backgroundColor: Colors.blue),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.logout),
-              label: 'Выхода',
-              backgroundColor: Colors.blue),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calculate),
-              label: 'Итог',
-              backgroundColor: Colors.blue)
-        ],
-        currentIndex: _selectedIndex, //this.handler.getSelectedIndex(),
-        selectedItemColor: Colors.yellow,
-        onTap: _onItemTapped,
-      ),
-    );
+        body: ListView.builder(
+          itemCount: dataFromDB.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Dismissible(
+              direction: DismissDirection.endToStart,
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.symmetric(horizontal: 0.0),
+                child: Icon(Icons.delete_forever),
+              ),
+              key: UniqueKey(),
+              onDismissed: (DismissDirection direction) async {
+                this.handler.retrieveSlices(_selectedIndex);
+
+                print("-----");
+                print(index);
+                print(dataFromDB.length);
+                print(dataFromDB[index].id!);
+                // if (dataFromDB[index+1] != null && dataFromDB.length > index) {
+                //   print(dataFromDB[index+1].id);
+                // }
+                print("-----");
+                //
+                await handler.deleteSlice(
+                    dataFromDB[index].id!, _selectedIndex);
+                dataFromDB.removeAt(index);
+                setState(() {
+                  //snapshot.data![0].remove(snapshot.data![0][index]);
+                });
+              },
+              child: Container(
+                constraints: BoxConstraints.expand(
+                  height:
+                      Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
+                          170.0,
+                ),
+                padding: const EdgeInsets.all(10.0),
+                //color: Colors.,
+                alignment: Alignment.center,
+                child: ListView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(0),
+                  children:
+                      getChildrensNew(index, dataFromDB), //this.result[index],
+                ),
+              ),
+            );
+          },
+        ),
+        // body: FutureBuilder(
+        //   future: Future.wait([
+        //     this.handler.retrieveSlices(this.handler.getSelectedIndex()),
+        //     this.handler.calculateResult(),
+        //     this.handler.getIndex(),
+        //     this.handler.resultsForATable()
+        //     //Future that returns bool
+        //   ]),
+        //   builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        //     if (snapshot.hasData) {
+        //       if (snapshot.data![2][0] == 4) {
+        //         return getRes(snapshot);
+        //       }
+        //
+        //       return raysPage(snapshot);
+        //     } else {
+        //       return Center(child: CircularProgressIndicator());
+        //     }
+        //   },
+        // ),
+        floatingActionButton: Visibility(
+          visible: _selectedIndex != 4 ? true : false,
+          child: FloatingActionButton(
+            onPressed: () async {
+              await addSlices(_selectedIndex);
+              await this.handler.retrieveSlices(_selectedIndex).then((result) {
+                // loading = false;
+                dataFromDB = result;
+              });
+              //await
+              setState(() {});
+            },
+            child: const Icon(Icons.add),
+            backgroundColor: Colors.green,
+          ),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.public),
+                label: 'Земли',
+                backgroundColor: Colors.blue),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.accessibility_new),
+                label: 'Человека',
+                backgroundColor: Colors.blue),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.undo),
+                label: 'Возврата',
+                backgroundColor: Colors.blue),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.logout),
+                label: 'Выхода',
+                backgroundColor: Colors.blue),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.calculate),
+                label: 'Итог',
+                backgroundColor: Colors.blue)
+          ],
+          currentIndex: _selectedIndex, //this.handler.getSelectedIndex(),
+          selectedItemColor: Colors.yellow,
+          onTap: switchBetweenRays,
+        ),
+      );
+    }
   }
 
   Future<int> addSlices(selectedIndex) async {
-    Slice firstSlice =
-        Slice(selectedSlice: 0, selectedInterval: getTime[selectedIndex]);
-    List<Slice> listOfSlices = [firstSlice];
-    return await this.handler.insertSlice(listOfSlices, selectedIndex);
+    Slice firstSlice = Slice(
+        selectedSlice: "Указать срез",
+        mealName: "",
+        selectedInterval: getTime[selectedIndex]);
+    return await this.handler.insertSlice(firstSlice, selectedIndex);
   }
 }
 
 class Slice {
   final int? id;
-  int selectedSlice;
+  String? mealName;
+  String selectedSlice;
   String selectedInterval;
 
-  Slice({this.id, required this.selectedSlice, required this.selectedInterval});
+  Slice(
+      {this.id,
+      this.mealName,
+      required this.selectedSlice,
+      required this.selectedInterval});
 
   Slice.fromMap(Map<String, dynamic> res)
       : id = res["id"],
+        mealName = res["mealName"],
         selectedSlice = res["selectedSlice"],
         selectedInterval = res["selectedInterval"];
 
   Map<String, Object?> toMap() {
     return {
       'id': id,
+      'mealName': mealName,
       'selectedSlice': selectedSlice,
       'selectedInterval': selectedInterval
     };
@@ -893,19 +648,19 @@ class DatabaseHandler {
     String path = await getDatabasesPath();
 
     return openDatabase(
-      join(path, 'rn12.db'),
+      join(path, 'rn20.db'),
       onCreate: (database, version) async {
         await database.execute(
-          "CREATE TABLE RayOfEarth(id INTEGER PRIMARY KEY AUTOINCREMENT, selectedSlice int, selectedInterval string)",
+          "CREATE TABLE RayOfEarth(id INTEGER PRIMARY KEY AUTOINCREMENT, mealName string, selectedSlice string, selectedInterval string)",
         );
         await database.execute(
-          "CREATE TABLE RayOfHuman(id INTEGER PRIMARY KEY AUTOINCREMENT, selectedSlice int, selectedInterval string)",
+          "CREATE TABLE RayOfHuman(id INTEGER PRIMARY KEY AUTOINCREMENT, mealName string, selectedSlice string, selectedInterval string)",
         );
         await database.execute(
-          "CREATE TABLE RayOfReturn(id INTEGER PRIMARY KEY AUTOINCREMENT, selectedSlice int, selectedInterval string)",
+          "CREATE TABLE RayOfReturn(id INTEGER PRIMARY KEY AUTOINCREMENT, mealName string, selectedSlice string, selectedInterval string)",
         );
         await database.execute(
-          "CREATE TABLE RayOfExit(id INTEGER PRIMARY KEY AUTOINCREMENT,  selectedSlice int, selectedInterval string)",
+          "CREATE TABLE RayOfExit(id INTEGER PRIMARY KEY AUTOINCREMENT,  mealName string, selectedSlice string, selectedInterval string)",
         );
         await database.execute(
           "CREATE TABLE Results(id INTEGER PRIMARY KEY AUTOINCREMENT, RayOfEarth int NOT NULL,RayOfHuman int NOT NULL, RayOfReturn int NOT NULL, RayOfExit int NOT NULL)",
@@ -915,12 +670,12 @@ class DatabaseHandler {
     );
   }
 
-  Future<int> insertSlice(List<Slice> slices, int _selectedIndex) async {
+  Future<int> insertSlice(Slice slices, int _selectedIndex) async {
     int result = 0;
     final Database db = await initializeDB();
-    for (var slice in slices) {
-      result = await db.insert(rayname[_selectedIndex], slice.toMap());
-    }
+
+    result = await db.insert(rayname[_selectedIndex], slices.toMap());
+
     return result;
   }
 
@@ -928,9 +683,9 @@ class DatabaseHandler {
     final Database db = await initializeDB();
     List<Map<String, Object?>> queryResult =
         await db.query(rayname[_selectedIndex]);
-    // print(")(");
-    // print(queryResult);
-    // print(")(");
+    print(")(");
+    print(queryResult);
+    print(")(");
     return queryResult.map((e) => Slice.fromMap(e)).toList();
   }
 
@@ -1058,7 +813,15 @@ class DatabaseHandler {
   Future<List> calculateResult() async {
     final db = await initializeDB();
     //List finalResult = [0, 0, 0, 0];
-    List<List<dynamic>> finalResult = [[0,0,0,0],[[''],[''],[''],['']]];
+    List<List<dynamic>> finalResult = [
+      [0, 0, 0, 0],
+      [
+        [''],
+        [''],
+        [''],
+        ['']
+      ]
+    ];
     for (int i = 0; i < rayname.length - 1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
       var x = queryResult.map((e) => Slice.fromMap(e)).toList();
@@ -1068,13 +831,12 @@ class DatabaseHandler {
             if (x[e].selectedSlice == 0) {
               finalResult[0][i] = finalResult[0][i] + 0;
             } else {
-              int rc =getRayCoefficient(
-                  rayname[i], x[e].selectedSlice.toInt() - 1);
-              int ri = getIntervalCoefficient(x[e].selectedInterval);
-              int fr = rc * ri;
-              finalResult[1][i]="$rc * $ri =$fr";
-              finalResult[0][i] = finalResult[0][i] + fr ;
-
+              // int rc =
+              //     getRayCoefficient(rayname[i], x[e].selectedSlice.toInt() - 1);
+              // int ri = getIntervalCoefficient(x[e].selectedInterval);
+              // int fr = rc * ri;
+              // finalResult[1][i] = "$rc * $ri =$fr";
+              // finalResult[0][i] = finalResult[0][i] + fr;
             }
           }
         }
@@ -1083,10 +845,11 @@ class DatabaseHandler {
 
     return finalResult;
   }
+
   Future<List> resultsForATable() async {
     final db = await initializeDB();
     //List finalResult = [0, 0, 0, 0];
-    List<List<String>> finalResult = [[],[],[],[]];
+    List<List<String>> finalResult = [[], [], [], []];
 
     for (int i = 0; i < rayname.length - 1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
@@ -1097,13 +860,12 @@ class DatabaseHandler {
             if (x[e].selectedSlice == 0) {
               finalResult[i] = finalResult[i];
             } else {
-              int rc =getRayCoefficient(
-                  rayname[i], x[e].selectedSlice.toInt() - 1);
-              int ri = getIntervalCoefficient(x[e].selectedInterval);
-              int fr = rc * ri;
-              finalResult[i].insert(finalResult[i].length, "$rc * $ri =$fr");
-              //finalResult[0][i] = finalResult[0][i] + fr ;
-
+              // int rc =
+              //     getRayCoefficient(rayname[i], x[e].selectedSlice.toInt() - 1);
+              // int ri = getIntervalCoefficient(x[e].selectedInterval);
+              // int fr = rc * ri;
+              // finalResult[i].insert(finalResult[i].length, "$rc * $ri =$fr");
+              // finalResult[0][i] = finalResult[0][i] + fr ;
             }
           }
         }
@@ -1192,41 +954,46 @@ class CustomList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Stack(children: [SizedBox(
-        height: 100,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 2.0, 0.0),
-                child: Center(
-                    child: CircleAvatar(
-                      backgroundColor: const Color(0xff764abc),
-                      child: Text(numberOfSlice),
-                    ))),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
-                child: _SliceDescription(
-                  firstParametr: firstParametr,
-                  secondParametr: secondParametr,
-                  thirdParametr: thirdParametr,
-                ),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Stack(
+          children: [
+            SizedBox(
+              height: 50,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(10.0, 0.0, 2.0, 0.0),
+                      child: Center(
+                          child: CircleAvatar(
+                        backgroundColor: const Color(0xff764abc),
+                        child: Text(numberOfSlice),
+                      ))),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
+                      child: _SliceDescription(
+                        firstParametr: firstParametr,
+                        secondParametr: secondParametr,
+                        thirdParametr: thirdParametr,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
-      ),],)
-    );
+        ));
   }
 }
+
 class MyCustomForm extends StatefulWidget {
   const MyCustomForm({super.key});
 
   @override
   State<MyCustomForm> createState() => _MyCustomFormState();
 }
+
 class _MyCustomFormState extends State<MyCustomForm> {
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
