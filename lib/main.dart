@@ -55,6 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // loading = false;
       dataFromDB = result;
     });
+    await this.handler.calculateResult().then((res) {
+      finalResult = res;
+    });
     setState(() {
       this.handler.setIndex(index);
     });
@@ -65,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     slice.selectedInterval = interval!;
     await this.handler.updateSlice(slice, selectedIndex);
   }
+
 
   saveSlice(String? sliceNumber, Slice slice, int selectedIndex) async {
     //запись выбранного интервала в базу
@@ -201,19 +205,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
+
   // var w;
-  getRes(AsyncSnapshot<List<dynamic>> snapshot) {
+  getRes(List<List> result) {
+
     //Возвращает страницу с результатами
     // Future<List> _futureOfList = handler.calculateResult();
     // List list = await _futureOfList;
     double width = 98;
     List<TableCell> res = [];
-//print(snapshot.data![1]![1][0].length);
-//print(snapshot.data![1]![1]);
-    //for (int i = 0; i < snapshot.data![1]![0].length; i++) {}
-    //w =
-    if (snapshot.data != null) {
-      if (snapshot.data![1] != null) {
+
+
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 20.0),
           //height: 158.0,
@@ -239,9 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 semanticLabel:
                                     'Text to announce in accessibility modes',
                               ),
-                              Text(snapshot.data![1]![0][0] != null
-                                  ? snapshot.data![1]![0][0].toString()
-                                  : "0"),
+                              Text(finalResult[0][0].toString())
                             ],
                           ),
                         ),
@@ -260,9 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               semanticLabel:
                                   'Text to announce in accessibility modes',
                             ),
-                            Text(snapshot.data![1][0][1] != null
-                                ? snapshot.data![1][0][1]!.toString()
-                                : "0"),
+                            Text(finalResult[0][1].toString())
                           ],
                         ),
                       )),
@@ -280,9 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 semanticLabel:
                                     'Text to announce in accessibility modes',
                               ),
-                              Text(snapshot.data![1]![0][2] != null
-                                  ? snapshot.data![1]![0][2].toString()
-                                  : "0"),
+                              Text(finalResult[0][2].toString())
                             ],
                           ),
                         ),
@@ -301,9 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               semanticLabel:
                                   'Text to announce in accessibility modes',
                             ),
-                            Text(snapshot.data![1]![0][3] != null
-                                ? snapshot.data![1]![0][3].toString()
-                                : "0"),
+                            Text(finalResult[0][3].toString()),
                           ],
                         ),
                       ))
@@ -318,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Table(
                     border: TableBorder.all(),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    children: gtr(snapshot),
+                    children: gtr(),
                   ),
                   SizedBox(height: 5.0),
                   new Container(
@@ -348,11 +342,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         );
-      }
-    }
+
+
   }
 
-  List<TableRow> gtr(AsyncSnapshot<List<dynamic>> snapshot) {
+  List<TableRow> gtr() {
     List<TableRow> x = [
       TableRow(
         decoration: const BoxDecoration(
@@ -378,18 +372,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     ];
     int maxLength = 0;
-    maxLength >= snapshot.data![3][0].length
-        ? 0
-        : maxLength = snapshot.data![3][0].length;
-    maxLength >= snapshot.data![3][1].length
-        ? 0
-        : maxLength = snapshot.data![3][1].length;
-    maxLength >= snapshot.data![3][2].length
-        ? 0
-        : maxLength = snapshot.data![3][2].length;
-    maxLength >= snapshot.data![3][3].length
-        ? 0
-        : maxLength = snapshot.data![3][3].length;
+    // maxLength >= snapshot.data![3][0].length
+    //     ? 0
+    //     : maxLength = snapshot.data![3][0].length;
+    // maxLength >= snapshot.data![3][1].length
+    //     ? 0
+    //     : maxLength = snapshot.data![3][1].length;
+    // maxLength >= snapshot.data![3][2].length
+    //     ? 0
+    //     : maxLength = snapshot.data![3][2].length;
+    // maxLength >= snapshot.data![3][3].length
+    //     ? 0
+    //     : maxLength = snapshot.data![3][3].length;
 
     for (int i = 0; i < maxLength; i++) {
       TableRow tr;
@@ -400,31 +394,31 @@ class _MyHomePageState extends State<MyHomePage> {
       // if (snapshot.data![3][0].isNotEmpty){
       //     if (snapshot.data![3][0][0]){}
       // }
-      snapshot.data![3][0].asMap().containsKey(i)
-          ? text1 = Text(snapshot.data![3][0][i])
-          : text1 = const Text('');
-      snapshot.data![3][1].asMap().containsKey(i)
-          ? text2 = Text(snapshot.data![3][1][i])
-          : text2 = const Text('');
-      snapshot.data![3][2].asMap().containsKey(i)
-          ? text3 = Text(snapshot.data![3][2][i])
-          : text3 = Text('');
-      snapshot.data![3][3].asMap().containsKey(i)
-          ? text4 = Text(snapshot.data![3][3][i])
-          : text4 = const Text('');
+      // snapshot.data![3][0].asMap().containsKey(i)
+      //     ? text1 = Text(snapshot.data![3][0][i])
+      //     : text1 = const Text('');
+      // snapshot.data![3][1].asMap().containsKey(i)
+      //     ? text2 = Text(snapshot.data![3][1][i])
+      //     : text2 = const Text('');
+      // snapshot.data![3][2].asMap().containsKey(i)
+      //     ? text3 = Text(snapshot.data![3][2][i])
+      //     : text3 = Text('');
+      // snapshot.data![3][3].asMap().containsKey(i)
+      //     ? text4 = Text(snapshot.data![3][3][i])
+      //     : text4 = const Text('');
 
       tr = TableRow(
         decoration: const BoxDecoration(
           color: Colors.blue,
         ),
         children: <Widget>[
-          text1,
-          text2,
+          Text("data"),
+          Text("data"),
           TableCell(
-            child: text3,
+            child: Text("data"),
           ),
           TableCell(
-            child: text4,
+            child: Text("data"),
           ),
         ],
       );
@@ -436,6 +430,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
   late List<Slice> dataFromDB;
+  late List<List>finalResult;
   bool loading = true;
 
   @override
@@ -459,6 +454,11 @@ class _MyHomePageState extends State<MyHomePage> {
         // }
       });
     });
+    this.handler.calculateResult().then((value) {
+      loading = false;
+      finalResult = value;
+    });
+
   }
 
   @override
@@ -481,7 +481,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(
               title[this.handler.getSelectedIndex()]), //Text(widget.title!),
         ),
-        body: ListView.builder(
+        body: _selectedIndex != 4 ? ListView.builder(
           itemCount: dataFromDB.length,
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(
@@ -530,7 +530,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           },
-        ),
+        ):getRes(finalResult),
         // body: FutureBuilder(
         //   future: Future.wait([
         //     this.handler.retrieveSlices(this.handler.getSelectedIndex()),
@@ -605,6 +605,8 @@ class _MyHomePageState extends State<MyHomePage> {
         selectedInterval: getTime[selectedIndex]);
     return await this.handler.insertSlice(firstSlice, selectedIndex);
   }
+
+
 }
 
 class Slice {
@@ -725,27 +727,31 @@ class DatabaseHandler {
     queryResult.map((e) => Slice.fromMap(e)).toList();
   }
 
-  int getRayCoefficient(String rayName, int slice) {
-    final coefficientRayOfEarth = [27, 20, 14, 7];
+  int getRayCoefficient(String rayName, String slice) {
 
-    final coefficientRayOfHuman = [27, 23, 18, 14, 9, 5];
+    final coefficientRayOfEarth = {Data.data[0][0][0]:27, Data.data[0][1][0]:20, Data.data[0][2][0]:14, Data.data[0][3][0]:7};
 
-    final coefficientRayOfReturn = [27, 24, 20, 16, 12, 8, 4];
+    final coefficientRayOfHuman = {Data.data[1][0][0]:27, Data.data[1][1][0]:23, Data.data[1][2][0]:18, Data.data[1][3][0]:14, Data.data[1][4][0]:9, Data.data[1][5][0]:5};
 
-    final coefficientRayOfExit = [27, 24, 21, 18, 15, 12, 9, 6, 3];
+    final coefficientRayOfReturn = {Data.data[2][0][0]:27, Data.data[2][1][0]:24, Data.data[2][2][0]:20, Data.data[2][3][0]:16, Data.data[2][4][0]:12, Data.data[2][5][0]:8, Data.data[2][6][0]:4};
+
+    final coefficientRayOfExit = {Data.data[3][0][0]:27, Data.data[3][1][0]:24, Data.data[3][2][0]:21, Data.data[3][3][0]:18, Data.data[3][4][0]:15, Data.data[3][5][0]:12, Data.data[3][6][0]:9, Data.data[3][7][0]:6, Data.data[3][8][0]:3};
 
     switch (rayName) {
       case 'RayOfEarth':
-        return coefficientRayOfEarth[slice].toInt();
+        print("iiiiiiiii");
+        print(coefficientRayOfEarth[slice]!);
+        print("iiiiiiiii");
+        return coefficientRayOfEarth[slice]!;
         break;
       case 'RayOfHuman':
-        return coefficientRayOfHuman[slice].toInt();
+        return coefficientRayOfHuman[slice]!;
         break;
       case 'RayOfReturn':
-        return coefficientRayOfReturn[slice].toInt();
+        return coefficientRayOfReturn[slice]!;
         break;
       case 'RayOfExit':
-        return coefficientRayOfExit[slice].toInt();
+        return coefficientRayOfExit[slice]!;
         break;
       default:
         return 0;
@@ -810,10 +816,10 @@ class DatabaseHandler {
     }
   }
 
-  Future<List> calculateResult() async {
+  Future<List<List>> calculateResult() async {
     final db = await initializeDB();
-    //List finalResult = [0, 0, 0, 0];
-    List<List<dynamic>> finalResult = [
+
+    List<List>finalResult = [
       [0, 0, 0, 0],
       [
         [''],
@@ -822,21 +828,27 @@ class DatabaseHandler {
         ['']
       ]
     ];
+
     for (int i = 0; i < rayname.length - 1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
       var x = queryResult.map((e) => Slice.fromMap(e)).toList();
       if (x.isNotEmpty) {
         if (x.length > 0) {
           for (int e = 0; e < x.length; e++) {
-            if (x[e].selectedSlice == 0) {
+            if (x[e].selectedSlice == "Указать срез") {
               finalResult[0][i] = finalResult[0][i] + 0;
             } else {
-              // int rc =
-              //     getRayCoefficient(rayname[i], x[e].selectedSlice.toInt() - 1);
-              // int ri = getIntervalCoefficient(x[e].selectedInterval);
-              // int fr = rc * ri;
-              // finalResult[1][i] = "$rc * $ri =$fr";
-              // finalResult[0][i] = finalResult[0][i] + fr;
+
+              print("||||||||||||");
+              print(x[e].selectedSlice);
+              print("||||||||||||");
+
+              int rc = getRayCoefficient(rayname[i], x[e].selectedSlice);
+              int ri = getIntervalCoefficient(x[e].selectedInterval);
+              int fr = rc * ri;
+              finalResult[1][i] = "$rc * $ri =$fr";
+              finalResult[0][i] = finalResult[0][i] + fr;
+
             }
           }
         }
