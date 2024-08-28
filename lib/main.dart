@@ -69,7 +69,6 @@ class _MyHomePageState extends State<MyHomePage> {
     await this.handler.updateSlice(slice, selectedIndex);
   }
 
-
   saveSlice(String? sliceNumber, Slice slice, int selectedIndex) async {
     //запись выбранного интервала в базу
     slice.selectedSlice = sliceNumber!;
@@ -145,7 +144,6 @@ class _MyHomePageState extends State<MyHomePage> {
           height: 5,
         ));
 
-
     var i = 0;
     var slices = Container(
       color: Colors.blue,
@@ -171,8 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
             });
           });
         },
-        dropdownMenuEntries:
-            Data.slicesData[_selectedIndex].map<DropdownMenuEntry<String>>((String value) {
+        dropdownMenuEntries: Data.slicesData[_selectedIndex]
+            .map<DropdownMenuEntry<String>>((String value) {
           if (value != "Указать срез") {
             i++;
           }
@@ -204,149 +202,166 @@ class _MyHomePageState extends State<MyHomePage> {
     return x;
   }
 
-
+  List<Widget> xx = [];
 
   // var w;
   getRes(List<List> result) {
-
     //Возвращает страницу с результатами
     // Future<List> _futureOfList = handler.calculateResult();
     // List list = await _futureOfList;
     double width = 98;
     List<TableCell> res = [];
 
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20.0),
+      //height: 158.0,
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
+        children: gC(),
+      ),
+    );
+  }
 
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 20.0),
-          //height: 158.0,
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.all(8.0),
-          child: ListView(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+  gC() {
+    List<Widget> xxx = [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  color: Colors.blue,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          color: Colors.blue,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              const Icon(
-                                Icons.public,
-                                color: Colors.black,
-                                size: 24.0,
-                                semanticLabel:
-                                    'Text to announce in accessibility modes',
-                              ),
-                              Text(finalResult[0][0].toString())
-                            ],
-                          ),
-                        ),
+                      const Icon(
+                        Icons.public,
+                        color: Colors.black,
+                        size: 24.0,
+                        semanticLabel:
+                            'Text to announce in accessibility modes',
                       ),
-                      Expanded(
-                          child: Container(
-                        //width: width,
-                        color: Colors.green,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            const Icon(
-                              Icons.accessibility_new,
-                              color: Colors.black,
-                              size: 24.0,
-                              semanticLabel:
-                                  'Text to announce in accessibility modes',
-                            ),
-                            Text(finalResult[0][1].toString())
-                          ],
-                        ),
-                      )),
-                      Expanded(
-                        child: Container(
-                          //width: width,
-                          color: Colors.yellow,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              const Icon(
-                                Icons.undo,
-                                color: Colors.black,
-                                size: 24.0,
-                                semanticLabel:
-                                    'Text to announce in accessibility modes',
-                              ),
-                              Text(finalResult[0][2].toString())
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                          child: Container(
-                        //width: width,
-                        color: Colors.orange,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            const Icon(
-                              Icons.logout,
-                              color: Colors.black,
-                              size: 24.0,
-                              semanticLabel:
-                                  'Text to announce in accessibility modes',
-                            ),
-                            Text(finalResult[0][3].toString()),
-                          ],
-                        ),
-                      ))
+                      Text(finalResult[0][0].toString())
                     ],
-                  )
-                ],
+                  ),
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 10.0),
-                  Table(
-                    border: TableBorder.all(),
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    children: gtr(),
-                  ),
-                  SizedBox(height: 5.0),
-                  new Container(
-                    margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                    height: 40.0,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25.0),
-                        color: Colors.green.withOpacity(0.25)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 15.0, right: 15.0, top: 8.0),
-                      child: Text(
-                        'Очисть все.(В разработке)',
-                        style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: 20.0,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
+              Expanded(
+                  child: Container(
+                //width: width,
+                color: Colors.green,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    const Icon(
+                      Icons.accessibility_new,
+                      color: Colors.black,
+                      size: 24.0,
+                      semanticLabel: 'Text to announce in accessibility modes',
                     ),
+                    Text(finalResult[0][1].toString())
+                  ],
+                ),
+              )),
+              Expanded(
+                child: Container(
+                  //width: width,
+                  color: Colors.yellow,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      const Icon(
+                        Icons.undo,
+                        color: Colors.black,
+                        size: 24.0,
+                        semanticLabel:
+                            'Text to announce in accessibility modes',
+                      ),
+                      Text(finalResult[0][2].toString())
+                    ],
                   ),
-                  SizedBox(height: 10.0)
-                ],
-              )
+                ),
+              ),
+              Expanded(
+                  child: Container(
+                //width: width,
+                color: Colors.orange,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    const Icon(
+                      Icons.logout,
+                      color: Colors.black,
+                      size: 24.0,
+                      semanticLabel: 'Text to announce in accessibility modes',
+                    ),
+                    Text(finalResult[0][3].toString()),
+                  ],
+                ),
+              ))
             ],
+          )
+        ],
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 10.0),
+          Table(
+            border: TableBorder.all(),
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: gtr(),
           ),
-        );
+          SizedBox(height: 5.0),
+          new Container(
+            margin: EdgeInsets.only(left: 10.0, right: 10.0),
+            height: 40.0,
+            width: double.infinity,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25.0),
+                color: Colors.green.withOpacity(0.25)),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 8.0),
+              child: Text(
+                'Очисть все.(В разработке)',
+                style: TextStyle(
+                    fontFamily: 'Quicksand',
+                    fontSize: 20.0,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          SizedBox(height: 10.0),
+        ],
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 5.0),
+        ],
+      ),
+    ];
 
+    for (int k = 0; k < finalResult[0].length; k++) {
+      xxx.insert(
+          xxx.length,
+          Padding(
+            padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 8.0),
+            child: Center(
+              child: Container(child: Text("Test  "),),
+            ),
+          ));
+    }
 
+    return xxx;
   }
 
   List<TableRow> gtr() {
+    print(finalResult);
     List<TableRow> x = [
       TableRow(
         decoration: const BoxDecoration(
@@ -371,66 +386,84 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     ];
-    int maxLength = 0;
-    // maxLength >= snapshot.data![3][0].length
-    //     ? 0
-    //     : maxLength = snapshot.data![3][0].length;
-    // maxLength >= snapshot.data![3][1].length
-    //     ? 0
-    //     : maxLength = snapshot.data![3][1].length;
-    // maxLength >= snapshot.data![3][2].length
-    //     ? 0
-    //     : maxLength = snapshot.data![3][2].length;
-    // maxLength >= snapshot.data![3][3].length
-    //     ? 0
-    //     : maxLength = snapshot.data![3][3].length;
 
-    for (int i = 0; i < maxLength; i++) {
+    int maxLength = 0;
+    maxLength >= finalResult[1][0].length
+        ? 0
+        : maxLength = finalResult[1][0].length;
+    maxLength >= finalResult[1][1].length
+        ? 0
+        : maxLength = finalResult[1][1].length;
+    maxLength >= finalResult[1][2].length
+        ? 0
+        : maxLength = finalResult[1][2].length;
+    maxLength >= finalResult[1][3].length
+        ? 0
+        : maxLength = finalResult[1][3].length;
+
+    for (int i = 0; i < maxLength - 1; i++) {
       TableRow tr;
       Text text1;
       Text text2;
       Text text3;
       Text text4;
       // if (snapshot.data![3][0].isNotEmpty){
-      //     if (snapshot.data![3][0][0]){}
+      //
       // }
-      // snapshot.data![3][0].asMap().containsKey(i)
-      //     ? text1 = Text(snapshot.data![3][0][i])
-      //     : text1 = const Text('');
-      // snapshot.data![3][1].asMap().containsKey(i)
-      //     ? text2 = Text(snapshot.data![3][1][i])
-      //     : text2 = const Text('');
-      // snapshot.data![3][2].asMap().containsKey(i)
-      //     ? text3 = Text(snapshot.data![3][2][i])
-      //     : text3 = Text('');
-      // snapshot.data![3][3].asMap().containsKey(i)
-      //     ? text4 = Text(snapshot.data![3][3][i])
-      //     : text4 = const Text('');
+      finalResult[1][0].asMap().containsKey(i)
+          ? text1 = Text(finalResult[1][0][i])
+          : text1 = const Text('');
+      finalResult[1][1].asMap().containsKey(i)
+          ? text2 = Text(finalResult[1][1][i])
+          : text2 = const Text('');
+      finalResult[1][2].asMap().containsKey(i)
+          ? text3 = Text(finalResult[1][2][i])
+          : text3 = Text('');
+      finalResult[1][3].asMap().containsKey(i)
+          ? text4 = Text(finalResult[1][3][i])
+          : text4 = const Text('');
 
       tr = TableRow(
         decoration: const BoxDecoration(
           color: Colors.blue,
         ),
         children: <Widget>[
-          Text("data"),
-          Text("data"),
+          text1,
+          text2,
           TableCell(
-            child: Text("data"),
+            child: text3,
           ),
           TableCell(
-            child: Text("data"),
+            child: text4,
           ),
         ],
       );
       x.insert(x.length, tr);
     }
+
+// TableRow tr = TableRow(
+//   decoration: const BoxDecoration(
+//     color: Colors.blue,
+//   ),
+//   children: <Widget>[
+//     Text(finalResult[1][0][0]),
+//     Text("data"),
+//     TableCell(
+//       child: Text("data"),
+//     ),
+//     TableCell(
+//       child: Text("data"),
+//     ),
+//   ],
+// );
+//x.insert(x.length, tr);
     return x;
   }
 
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
   late List<Slice> dataFromDB;
-  late List<List>finalResult;
+  late List<List> finalResult;
   bool loading = true;
 
   @override
@@ -458,7 +491,6 @@ class _MyHomePageState extends State<MyHomePage> {
       loading = false;
       finalResult = value;
     });
-
   }
 
   @override
@@ -481,56 +513,59 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(
               title[this.handler.getSelectedIndex()]), //Text(widget.title!),
         ),
-        body: _selectedIndex != 4 ? ListView.builder(
-          itemCount: dataFromDB.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Dismissible(
-              direction: DismissDirection.endToStart,
-              background: Container(
-                color: Colors.red,
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.symmetric(horizontal: 0.0),
-                child: Icon(Icons.delete_forever),
-              ),
-              key: UniqueKey(),
-              onDismissed: (DismissDirection direction) async {
-                this.handler.retrieveSlices(_selectedIndex);
+        body: _selectedIndex != 4
+            ? ListView.builder(
+                itemCount: dataFromDB.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Dismissible(
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: 0.0),
+                      child: Icon(Icons.delete_forever),
+                    ),
+                    key: UniqueKey(),
+                    onDismissed: (DismissDirection direction) async {
+                      this.handler.retrieveSlices(_selectedIndex);
 
-                print("-----");
-                print(index);
-                print(dataFromDB.length);
-                print(dataFromDB[index].id!);
-                // if (dataFromDB[index+1] != null && dataFromDB.length > index) {
-                //   print(dataFromDB[index+1].id);
-                // }
-                print("-----");
-                //
-                await handler.deleteSlice(
-                    dataFromDB[index].id!, _selectedIndex);
-                dataFromDB.removeAt(index);
-                setState(() {
-                  //snapshot.data![0].remove(snapshot.data![0][index]);
-                });
-              },
-              child: Container(
-                constraints: BoxConstraints.expand(
-                  height:
-                      Theme.of(context).textTheme.headline4!.fontSize! * 1.1 +
-                          170.0,
-                ),
-                padding: const EdgeInsets.all(10.0),
-                //color: Colors.,
-                alignment: Alignment.center,
-                child: ListView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(0),
-                  children:
-                      getChildrensNew(index, dataFromDB), //this.result[index],
-                ),
-              ),
-            );
-          },
-        ):getRes(finalResult),
+                      // print("-----");
+                      // print(index);
+                      // print(dataFromDB.length);
+                      // print(dataFromDB[index].id!);
+                      // // if (dataFromDB[index+1] != null && dataFromDB.length > index) {
+                      // //   print(dataFromDB[index+1].id);
+                      // // }
+                      // print("-----");
+                      // //
+                      await handler.deleteSlice(
+                          dataFromDB[index].id!, _selectedIndex);
+                      dataFromDB.removeAt(index);
+                      setState(() {
+                        //snapshot.data![0].remove(snapshot.data![0][index]);
+                      });
+                    },
+                    child: Container(
+                      constraints: BoxConstraints.expand(
+                        height:
+                            Theme.of(context).textTheme.headline4!.fontSize! *
+                                    1.1 +
+                                170.0,
+                      ),
+                      padding: const EdgeInsets.all(10.0),
+                      //color: Colors.,
+                      alignment: Alignment.center,
+                      child: ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(0),
+                        children: getChildrensNew(
+                            index, dataFromDB), //this.result[index],
+                      ),
+                    ),
+                  );
+                },
+              )
+            : getRes(finalResult),
         // body: FutureBuilder(
         //   future: Future.wait([
         //     this.handler.retrieveSlices(this.handler.getSelectedIndex()),
@@ -605,8 +640,6 @@ class _MyHomePageState extends State<MyHomePage> {
         selectedInterval: getTime[selectedIndex]);
     return await this.handler.insertSlice(firstSlice, selectedIndex);
   }
-
-
 }
 
 class Slice {
@@ -728,20 +761,49 @@ class DatabaseHandler {
   }
 
   int getRayCoefficient(String rayName, String slice) {
+    final coefficientRayOfEarth = {
+      Data.data[0][0][0]: 27,
+      Data.data[0][1][0]: 20,
+      Data.data[0][2][0]: 14,
+      Data.data[0][3][0]: 7
+    };
 
-    final coefficientRayOfEarth = {Data.data[0][0][0]:27, Data.data[0][1][0]:20, Data.data[0][2][0]:14, Data.data[0][3][0]:7};
+    final coefficientRayOfHuman = {
+      Data.data[1][0][0]: 27,
+      Data.data[1][1][0]: 23,
+      Data.data[1][2][0]: 18,
+      Data.data[1][3][0]: 14,
+      Data.data[1][4][0]: 9,
+      Data.data[1][5][0]: 5
+    };
 
-    final coefficientRayOfHuman = {Data.data[1][0][0]:27, Data.data[1][1][0]:23, Data.data[1][2][0]:18, Data.data[1][3][0]:14, Data.data[1][4][0]:9, Data.data[1][5][0]:5};
+    final coefficientRayOfReturn = {
+      Data.data[2][0][0]: 27,
+      Data.data[2][1][0]: 24,
+      Data.data[2][2][0]: 20,
+      Data.data[2][3][0]: 16,
+      Data.data[2][4][0]: 12,
+      Data.data[2][5][0]: 8,
+      Data.data[2][6][0]: 4
+    };
 
-    final coefficientRayOfReturn = {Data.data[2][0][0]:27, Data.data[2][1][0]:24, Data.data[2][2][0]:20, Data.data[2][3][0]:16, Data.data[2][4][0]:12, Data.data[2][5][0]:8, Data.data[2][6][0]:4};
-
-    final coefficientRayOfExit = {Data.data[3][0][0]:27, Data.data[3][1][0]:24, Data.data[3][2][0]:21, Data.data[3][3][0]:18, Data.data[3][4][0]:15, Data.data[3][5][0]:12, Data.data[3][6][0]:9, Data.data[3][7][0]:6, Data.data[3][8][0]:3};
+    final coefficientRayOfExit = {
+      Data.data[3][0][0]: 27,
+      Data.data[3][1][0]: 24,
+      Data.data[3][2][0]: 21,
+      Data.data[3][3][0]: 18,
+      Data.data[3][4][0]: 15,
+      Data.data[3][5][0]: 12,
+      Data.data[3][6][0]: 9,
+      Data.data[3][7][0]: 6,
+      Data.data[3][8][0]: 3
+    };
 
     switch (rayName) {
       case 'RayOfEarth':
-        print("iiiiiiiii");
-        print(coefficientRayOfEarth[slice]!);
-        print("iiiiiiiii");
+        // print("iiiiiiiii");
+        // print(coefficientRayOfEarth[slice]!);
+        // print("iiiiiiiii");
         return coefficientRayOfEarth[slice]!;
         break;
       case 'RayOfHuman':
@@ -819,36 +881,47 @@ class DatabaseHandler {
   Future<List<List>> calculateResult() async {
     final db = await initializeDB();
 
-    List<List>finalResult = [
+    List<List<dynamic>> finalResult = [
       [0, 0, 0, 0],
       [
         [''],
         [''],
         [''],
         ['']
-      ]
+      ],
+      [
+        [''],
+        [''],
+        [''],
+        ['']
+      ],
     ];
 
     for (int i = 0; i < rayname.length - 1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
-      var x = queryResult.map((e) => Slice.fromMap(e)).toList();
-      if (x.isNotEmpty) {
-        if (x.length > 0) {
-          for (int e = 0; e < x.length; e++) {
-            if (x[e].selectedSlice == "Указать срез") {
+      var listWithSlices = queryResult.map((e) => Slice.fromMap(e)).toList();
+
+      if (listWithSlices.isNotEmpty) {
+        if (listWithSlices.length > 0) {
+          for (int e = 0; e < listWithSlices.length; e++) {
+            print("||||||||||||");
+            print(listWithSlices);
+            print("||||||||||||");
+            if (listWithSlices[e].selectedSlice == "Указать срез") {
               finalResult[0][i] = finalResult[0][i] + 0;
             } else {
-
-              print("||||||||||||");
-              print(x[e].selectedSlice);
-              print("||||||||||||");
-
-              int rc = getRayCoefficient(rayname[i], x[e].selectedSlice);
-              int ri = getIntervalCoefficient(x[e].selectedInterval);
+              int rc = getRayCoefficient(
+                  rayname[i], listWithSlices[e].selectedSlice);
+              int ri =
+                  getIntervalCoefficient(listWithSlices[e].selectedInterval);
               int fr = rc * ri;
-              finalResult[1][i] = "$rc * $ri =$fr";
+              print("====");
+              finalResult[1][i].insert(e, "$rc * $ri =$fr");
+              finalResult[2][i].insert(e, listWithSlices[e].mealName);
+              print(finalResult);
+              print("====");
+
               finalResult[0][i] = finalResult[0][i] + fr;
-
             }
           }
         }
@@ -858,34 +931,34 @@ class DatabaseHandler {
     return finalResult;
   }
 
-  Future<List> resultsForATable() async {
-    final db = await initializeDB();
-    //List finalResult = [0, 0, 0, 0];
-    List<List<String>> finalResult = [[], [], [], []];
-
-    for (int i = 0; i < rayname.length - 1; i++) {
-      final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
-      var x = queryResult.map((e) => Slice.fromMap(e)).toList();
-      if (x.isNotEmpty) {
-        if (x.length > 0) {
-          for (int e = 0; e < x.length; e++) {
-            if (x[e].selectedSlice == 0) {
-              finalResult[i] = finalResult[i];
-            } else {
-              // int rc =
-              //     getRayCoefficient(rayname[i], x[e].selectedSlice.toInt() - 1);
-              // int ri = getIntervalCoefficient(x[e].selectedInterval);
-              // int fr = rc * ri;
-              // finalResult[i].insert(finalResult[i].length, "$rc * $ri =$fr");
-              // finalResult[0][i] = finalResult[0][i] + fr ;
-            }
-          }
-        }
-      }
-    }
-
-    return finalResult;
-  }
+  // Future<List> resultsForATable() async {
+  //   final db = await initializeDB();
+  //   //List finalResult = [0, 0, 0, 0];
+  //   List<List<String>> finalResult = [[], [], [], []];
+  //
+  //   for (int i = 0; i < rayname.length - 1; i++) {
+  //     final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
+  //     var x = queryResult.map((e) => Slice.fromMap(e)).toList();
+  //     if (x.isNotEmpty) {
+  //       if (x.length > 0) {
+  //         for (int e = 0; e < x.length; e++) {
+  //           if (x[e].selectedSlice == 0) {
+  //             finalResult[i] = finalResult[i];
+  //           } else {
+  //             // int rc =
+  //             //     getRayCoefficient(rayname[i], x[e].selectedSlice.toInt() - 1);
+  //             // int ri = getIntervalCoefficient(x[e].selectedInterval);
+  //             // int fr = rc * ri;
+  //             // finalResult[i].insert(finalResult[i].length, "$rc * $ri =$fr");
+  //             // finalResult[0][i] = finalResult[0][i] + fr ;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //
+  //   return finalResult;
+  // }
 
   int _selectedIndex = 0;
 
