@@ -205,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> xx = [];
 
   // var w;
-  getRes(List<List> result) {
+  getRes(Map<String, dynamic> result) {
     //Возвращает страницу с результатами
     // Future<List> _futureOfList = handler.calculateResult();
     // List list = await _futureOfList;
@@ -243,7 +243,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         semanticLabel:
                             'Text to announce in accessibility modes',
                       ),
-                      Text(finalResult[0][0].toString())
+                      Text(finalResult['finalResult'][0].toString())
                     ],
                   ),
                 ),
@@ -261,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       size: 24.0,
                       semanticLabel: 'Text to announce in accessibility modes',
                     ),
-                    Text(finalResult[0][1].toString())
+                    Text(finalResult['finalResult'][1].toString())
                   ],
                 ),
               )),
@@ -279,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         semanticLabel:
                             'Text to announce in accessibility modes',
                       ),
-                      Text(finalResult[0][2].toString())
+                      Text(finalResult['finalResult'][2].toString())
                     ],
                   ),
                 ),
@@ -297,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       size: 24.0,
                       semanticLabel: 'Text to announce in accessibility modes',
                     ),
-                    Text(finalResult[0][3].toString()),
+                    Text(finalResult['finalResult'][3].toString()),
                   ],
                 ),
               ))
@@ -315,7 +315,17 @@ class _MyHomePageState extends State<MyHomePage> {
             children: gtr(),
           ),
           SizedBox(height: 5.0),
-          new Container(
+          GestureDetector(onTap:() async {
+            await this.handler.clearTables();
+            await this.handler.calculateResult().then((res) {
+              finalResult = res;
+            });
+            setState(() {
+
+            });
+          },
+            child: new Container(
+
             margin: EdgeInsets.only(left: 10.0, right: 10.0),
             height: 40.0,
             width: double.infinity,
@@ -325,7 +335,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Padding(
               padding: const EdgeInsets.only(left: 15.0, right: 15.0, top: 8.0),
               child: Text(
-                'Очисть все.(В разработке)',
+                'Очисть все.',
                 style: TextStyle(
                     fontFamily: 'Quicksand',
                     fontSize: 20.0,
@@ -334,7 +344,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 textAlign: TextAlign.center,
               ),
             ),
-          ),
+          )),
           SizedBox(height: 10.0),
         ],
       ),
@@ -345,16 +355,66 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     ];
+    for (int i = 0; i < 4; i++) {
+      for (int k = 0; k < finalResult['textFromTextField'][i][k].length; k++) {
+        xxx.insert(
+            xxx.length,
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0,),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
 
-    for (int k = 0; k < finalResult[0].length; k++) {
-      xxx.insert(
-          xxx.length,
-          Padding(
-            padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 8.0),
-            child: Center(
-              child: Container(child: Text("Test  "),),
-            ),
-          ));
+                  child: Text(
+                      finalResult['textFromTextField'][i][k].toString() + ""),
+                ),
+              ),
+            ));
+
+        xxx.insert(
+            xxx.length,
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, ),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+
+                  child: Text(finalResult['slicesInfo'][i][k].toString() + ""),
+                ),
+              ),
+            ));
+
+        xxx.insert(
+            xxx.length,
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, ),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+
+                  child: Text(finalResult['extraInfo'][i][k].toString() + ""),
+                ),
+              ),
+            ));
+
+        xxx.insert(
+            xxx.length,
+            Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0,),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0 ),
+                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+                  child: Text(finalResult['book'][i][k].toString() + ""),
+                ),
+              ),
+            ));
+
+      }
+      xxx.insert(xxx.length, SizedBox(height: 10,));
     }
 
     return xxx;
@@ -388,18 +448,18 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
 
     int maxLength = 0;
-    maxLength >= finalResult[1][0].length
+    maxLength >= finalResult['linesWithCalculation'][0].length
         ? 0
-        : maxLength = finalResult[1][0].length;
-    maxLength >= finalResult[1][1].length
+        : maxLength = finalResult['linesWithCalculation'][0].length;
+    maxLength >= finalResult['linesWithCalculation'][1].length
         ? 0
-        : maxLength = finalResult[1][1].length;
-    maxLength >= finalResult[1][2].length
+        : maxLength = finalResult['linesWithCalculation'][1].length;
+    maxLength >= finalResult['linesWithCalculation'][2].length
         ? 0
-        : maxLength = finalResult[1][2].length;
-    maxLength >= finalResult[1][3].length
+        : maxLength = finalResult['linesWithCalculation'][2].length;
+    maxLength >= finalResult['linesWithCalculation'][3].length
         ? 0
-        : maxLength = finalResult[1][3].length;
+        : maxLength = finalResult['linesWithCalculation'][3].length;
 
     for (int i = 0; i < maxLength - 1; i++) {
       TableRow tr;
@@ -410,17 +470,17 @@ class _MyHomePageState extends State<MyHomePage> {
       // if (snapshot.data![3][0].isNotEmpty){
       //
       // }
-      finalResult[1][0].asMap().containsKey(i)
-          ? text1 = Text(finalResult[1][0][i])
+      finalResult['linesWithCalculation'][0].asMap().containsKey(i)
+          ? text1 = Text(finalResult['linesWithCalculation'][0][i])
           : text1 = const Text('');
-      finalResult[1][1].asMap().containsKey(i)
-          ? text2 = Text(finalResult[1][1][i])
+      finalResult['linesWithCalculation'][1].asMap().containsKey(i)
+          ? text2 = Text(finalResult['linesWithCalculation'][1][i])
           : text2 = const Text('');
-      finalResult[1][2].asMap().containsKey(i)
-          ? text3 = Text(finalResult[1][2][i])
+      finalResult['linesWithCalculation'][2].asMap().containsKey(i)
+          ? text3 = Text(finalResult['linesWithCalculation'][2][i])
           : text3 = Text('');
-      finalResult[1][3].asMap().containsKey(i)
-          ? text4 = Text(finalResult[1][3][i])
+      finalResult['linesWithCalculation'][3].asMap().containsKey(i)
+          ? text4 = Text(finalResult['linesWithCalculation'][3][i])
           : text4 = const Text('');
 
       tr = TableRow(
@@ -446,7 +506,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //     color: Colors.blue,
 //   ),
 //   children: <Widget>[
-//     Text(finalResult[1][0][0]),
+//     Text(finalResult['linesWithCalculation'][0][0]),
 //     Text("data"),
 //     TableCell(
 //       child: Text("data"),
@@ -463,7 +523,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late DatabaseHandler handler;
   late List<List<Container>> result = [];
   late List<Slice> dataFromDB;
-  late List<List> finalResult;
+  late Map<String, dynamic> finalResult;
   bool loading = true;
 
   @override
@@ -739,6 +799,16 @@ class DatabaseHandler {
     // print(queryResult);
     //   print(")(");
   }
+  Future<void> clearTables() async {
+
+
+    final db = await initializeDB();
+    await db.rawDelete("DELETE FROM RayOfEarth");
+    await db.rawDelete("DELETE FROM RayOfHuman");
+    await db.rawDelete("DELETE FROM RayOfReturn");
+    await db.rawDelete("DELETE FROM RayOfExit");
+
+  }
 
   updateSlice(Slice slice, int _selectedIndex) async {
     // Get a reference to the database.
@@ -878,24 +948,41 @@ class DatabaseHandler {
     }
   }
 
-  Future<List<List>> calculateResult() async {
+  Future<dynamic> calculateResult() async {
     final db = await initializeDB();
-
-    List<List<dynamic>> finalResult = [
-      [0, 0, 0, 0],
-      [
+    Map<String, dynamic> finalResult = {
+      "finalResult": [0, 0, 0, 0],
+      "linesWithCalculation": [
         [''],
         [''],
         [''],
         ['']
       ],
-      [
+      "textFromTextField": [
         [''],
         [''],
         [''],
         ['']
       ],
-    ];
+      "slicesInfo": [
+        [''],
+        [''],
+        [''],
+        ['']
+      ],
+      "book": [
+        [''],
+        [''],
+        [''],
+        ['']
+      ],
+      "extraInfo": [
+        [''],
+        [''],
+        [''],
+        ['']
+      ]
+    };
 
     for (int i = 0; i < rayname.length - 1; i++) {
       final List<Map<String, Object?>> queryResult = await db.query(rayname[i]);
@@ -904,24 +991,30 @@ class DatabaseHandler {
       if (listWithSlices.isNotEmpty) {
         if (listWithSlices.length > 0) {
           for (int e = 0; e < listWithSlices.length; e++) {
-            print("||||||||||||");
-            print(listWithSlices);
-            print("||||||||||||");
+            // print("||||||||||||");
+            // print(listWithSlices);
+            // print("||||||||||||");
             if (listWithSlices[e].selectedSlice == "Указать срез") {
-              finalResult[0][i] = finalResult[0][i] + 0;
+              finalResult['finalResult'][i] = finalResult['finalResult'][i] + 0;
             } else {
               int rc = getRayCoefficient(
                   rayname[i], listWithSlices[e].selectedSlice);
               int ri =
                   getIntervalCoefficient(listWithSlices[e].selectedInterval);
               int fr = rc * ri;
-              print("====");
-              finalResult[1][i].insert(e, "$rc * $ri =$fr");
-              finalResult[2][i].insert(e, listWithSlices[e].mealName);
-              print(finalResult);
-              print("====");
 
-              finalResult[0][i] = finalResult[0][i] + fr;
+              finalResult['linesWithCalculation'][i]
+                  .insert(e, "$rc * $ri =$fr");
+              finalResult['textFromTextField'][i]
+                  .insert(e, listWithSlices[e].mealName);
+              finalResult['finalResult'][i] =
+                  finalResult['finalResult'][i] + fr;
+              finalResult['slicesInfo'][i]
+                  .insert(e, listWithSlices[e].selectedSlice);
+              finalResult['book'][i]
+                  .insert(e, getBook(listWithSlices[e].selectedSlice, i));
+              finalResult['extraInfo'][i]
+                  .insert(e, getExtraInfo(listWithSlices[e].selectedSlice, i));
             }
           }
         }
@@ -950,7 +1043,7 @@ class DatabaseHandler {
   //             // int ri = getIntervalCoefficient(x[e].selectedInterval);
   //             // int fr = rc * ri;
   //             // finalResult[i].insert(finalResult[i].length, "$rc * $ri =$fr");
-  //             // finalResult[0][i] = finalResult[0][i] + fr ;
+  //             // finalResult['finalResult'][i] = finalResult['finalResult'][i] + fr ;
   //           }
   //         }
   //       }
@@ -961,6 +1054,30 @@ class DatabaseHandler {
   // }
 
   int _selectedIndex = 0;
+
+  getExtraInfo (String nameOfSlice, int i) {
+
+    for (int k = 0; k < 4; k++) {
+      if (Data.data[i][k].contains(nameOfSlice)) {
+        return Data.data[i][k][1];
+      }
+    }
+
+    return "000";
+  }
+
+  String getBook(String nameOfSlice, int i) {
+    print('uuu');
+    print(i);
+    print(nameOfSlice);
+    for (int k = 0; k < 4; k++) {
+      if (Data.data[i][k].contains(nameOfSlice)) {
+        return Data.data[i][k][2];
+      }
+    }
+
+    return "000";
+  }
 
   Future<List> getIndex() async {
     List x = [_selectedIndex];
