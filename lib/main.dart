@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:rn/data.dart';
@@ -359,62 +360,91 @@ class _MyHomePageState extends State<MyHomePage> {
       for (int k = 0; k < finalResult['textFromTextField'][i][k].length; k++) {
         xxx.insert(
             xxx.length,
-            Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0,),
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
-                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+            Container(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+              decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
 
-                  child: Text(
-                      finalResult['textFromTextField'][i][k].toString() + ""),
-                ),
-              ),
-            ));
-
+              child: Center(child: Text(
+                  finalResult['textFromTextField'][i][k].toString() + ""),
+              ),));
         xxx.insert(
             xxx.length,
-            Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0, ),
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
-                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+            Container(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+              decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
 
-                  child: Text(finalResult['slicesInfo'][i][k].toString() + ""),
-                ),
-              ),
-            ));
-
+              child: Center(child: Text(
+                  finalResult['slicesInfo'][i][k].toString() + ""),
+              ),));
         xxx.insert(
             xxx.length,
-            Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0, ),
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
-                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+            Container(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+              decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
 
-                  child: Text(finalResult['extraInfo'][i][k].toString() + ""),
-                ),
-              ),
-            ));
-
+              child: Center(child: Text(
+                  finalResult['extraInfo'][i][k].toString() + ""),
+              ),));
         xxx.insert(
             xxx.length,
-            Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0,),
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0 ),
-                  decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
-                  child: Text(finalResult['book'][i][k].toString() + ""),
-                ),
-              ),
-            ));
+            Container(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+              decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+
+              child: Center(child: Text(
+                  finalResult['book'][i][k].toString() + ""),
+              ),));
+
+        // xxx.insert(
+        //     xxx.length,
+        //     Padding(
+        //       padding: EdgeInsets.only(left: 15.0, right: 15.0, ),
+        //       child: Center(
+        //         child: Container(
+        //           padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+        //           decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+        //
+        //           child: Text(finalResult['slicesInfo'][i][k].toString() + ""),
+        //         ),
+        //       ),
+        //     ));
+        //
+        //
+        // xxx.insert(
+        //     xxx.length,
+        //     Padding(
+        //       padding: EdgeInsets.only(left: 15.0, right: 15.0, ),
+        //       child: Center(
+        //         child: Container(
+        //           padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+        //           decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+        //
+        //           child: Text(finalResult['extraInfo'][i][k].toString() + ""),
+        //         ),
+        //       ),
+        //     ));
+        //
+        // xxx.insert(
+        //     xxx.length,
+        //     Padding(
+        //       padding: EdgeInsets.only(left: 15.0, right: 15.0,),
+        //       child: Center(
+        //         child: Container(
+        //           padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0 ),
+        //           decoration: BoxDecoration(color: i==0 ? Colors.blue : i == 1? Colors.green: i==2? Colors.yellow: Colors.orange),
+        //           child: Text(finalResult['book'][i][k].toString() + ""),
+        //         ),
+        //       ),
+        //     ));
+
+        xxx.insert(xxx.length, Divider(
+            color: Colors.black
+        ));
+        xxx.insert(xxx.length, SizedBox(height: 10,));
 
       }
-      xxx.insert(xxx.length, SizedBox(height: 10,));
+
+
     }
 
     return xxx;
@@ -1015,6 +1045,11 @@ class DatabaseHandler {
                   .insert(e, getBook(listWithSlices[e].selectedSlice, i));
               finalResult['extraInfo'][i]
                   .insert(e, getExtraInfo(listWithSlices[e].selectedSlice, i));
+            print("09090909");
+              print(listWithSlices[e].selectedSlice);
+              print(i);
+            print("09090909");
+
             }
           }
         }
@@ -1057,7 +1092,7 @@ class DatabaseHandler {
 
   getExtraInfo (String nameOfSlice, int i) {
 
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < Data.data[i].length; k++) {
       if (Data.data[i][k].contains(nameOfSlice)) {
         return Data.data[i][k][1];
       }
@@ -1067,10 +1102,10 @@ class DatabaseHandler {
   }
 
   String getBook(String nameOfSlice, int i) {
-    print('uuu');
-    print(i);
-    print(nameOfSlice);
-    for (int k = 0; k < 4; k++) {
+    // print('uuu');
+    // print(i);
+    // print(nameOfSlice);
+    for (int k = 0; k < Data.data[i].length; k++) {
       if (Data.data[i][k].contains(nameOfSlice)) {
         return Data.data[i][k][2];
       }
